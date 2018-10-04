@@ -47,7 +47,8 @@ public class Simulator implements Runnable {
         true;   // send System.out messages to stdout (console) as well as any custom handlers (see SystemOutHandler)
     public static boolean DEBUG_MODE = false;
 
-    public static final int    DEFAULT_SIM_SPEED = 500; // Hz
+    public static final int    DEFAULT_SIM_RATE = 500; // Hz
+    public static final int    DEFAULT_SPEED_FACTOR = 1;
     public static final int    DEFAULT_AUTOPILOT_SYSID =
         -1; // System ID of autopilot to communicate with. -1 to auto set ID on first received heartbeat.
     public static final String DEFAULT_AUTOPILOT_TYPE = "generic";  // eg. "px4" or "aq"
@@ -92,7 +93,8 @@ public class Simulator implements Runnable {
         1.57;  // channel value to physical movement (+/-90 deg)
 
 
-    private static int sleepInterval = (int)1e6 / DEFAULT_SIM_SPEED;  // Main loop interval, in us
+    private static int sleepInterval = (int)1e6 / DEFAULT_SIM_RATE;  // Main loop interval, in us
+    private static int speedFactor = DEFAULT_SPEED_FACTOR;
     private static int autopilotSysId = DEFAULT_AUTOPILOT_SYSID;
     private static String autopilotType = DEFAULT_AUTOPILOT_TYPE;
     private static String autopilotIpAddress = LOCAL_HOST;
@@ -115,6 +117,7 @@ public class Simulator implements Runnable {
     private World world;
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private SystemOutHandler outputHandler;
+    private volatile long initialMillis = 0;
 //  private int simDelayMax = 500;  // Max delay between simulated and real time to skip samples in simulator, in ms
 
     public volatile boolean shutdown = false;
@@ -469,7 +472,19 @@ public class Simulator implements Runnable {
     }
 
     private long getMillis() {
-        return System.currentTimeMillis();
+        long millis = System.currentTimeMillis();
+
+        if (initialMillis == 0) {
+            initialMillis = millis;
+            return millis;
+        }
+
+        if (speedFactor == 1) {
+            return millis;
+        } else {
+            return ((millis - initialMillis) * speedFactor) + initialMillis;
+        }
+
     }
 
     public final static String PRINT_INDICATION_STRING = "-m [<MsgID[, MsgID]...>]";
@@ -484,6 +499,7 @@ public class Simulator implements Runnable {
     public final static String GUI_VIEW_STRING = "-view (fpv|grnd|gmbl)";
     public final static String AP_STRING = "-ap <autopilot_type>";
     public final static String RATE_STRING = "-r <Hz>";
+    public final static String SPEED_FACTOR_STRING = "-f";
     public final static String CMD_STRING =
         "java [-Xmx512m] -cp lib/*:out/production/jmavsim.jar me.drton.jmavsim.Simulator";
     public final static String CMD_STRING_JAR = "java [-Xmx512m] -jar jmavsim_run.jar";
@@ -491,6 +507,7 @@ public class Simulator implements Runnable {
                                               UDP_STRING + " | " +
                                               SERIAL_STRING + "] [" +
                                               RATE_STRING + "] [" +
+                                              SPEED_FACTOR_STRING + "] [" +
                                               AP_STRING + "] [" +
                                               MAG_STRING + "] " + "[" +
                                               QGC_STRING + "] [" +
@@ -642,6 +659,20 @@ public class Simulator implements Runnable {
                     System.err.println("-r requires Hz as an argument.");
                     return;
                 }
+            } else if (arg.equals("-f")) {
+                if (i < args.length) {
+                    int f;
+                    try {
+                        f = Integer.parseInt(args[i++]);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Expected numeric argument after -f: " + SPEED_FACTOR_STRING);
+                        return;
+                    }
+                    speedFactor = f;
+                } else {
+                    System.err.println("-r requires Hz as an argument.");
+                    return;
+                }
             } else if (arg.equals("-view")) {
                 String t;
                 if (i < args.length) {
@@ -705,7 +736,10 @@ public class Simulator implements Runnable {
         System.out.println("      Default path/baud is: " + serialPath + " " + serialBaudRate + "");
         System.out.println(RATE_STRING);
         System.out.println("      Refresh rate at which jMAVSim runs. This dictates the frequency");
-        System.out.println("      of the HIL_SENSOR messages. Default is " + DEFAULT_SIM_SPEED + " Hz");
+        System.out.println("      of the HIL_SENSOR messages. Default is " + DEFAULT_SIM_RATE + " Hz");
+        System.out.println(SPEED_FACTOR_STRING);
+        System.out.println("      Speed factor at which jMAVSim runs. A factor of 2 means the system");
+        System.out.println("      runs double than real time speed. Default is " + DEFAULT_SPEED_FACTOR);
         System.out.println(AP_STRING);
         System.out.println("      Specify the MAV type. E.g. 'px4' or 'aq'. Default is: " + autopilotType +
                            "");
