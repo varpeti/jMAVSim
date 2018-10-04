@@ -487,10 +487,19 @@ public class Simulator implements Runnable {
     public final static String CMD_STRING =
         "java [-Xmx512m] -cp lib/*:out/production/jmavsim.jar me.drton.jmavsim.Simulator";
     public final static String CMD_STRING_JAR = "java [-Xmx512m] -jar jmavsim_run.jar";
-    public final static String USAGE_STRING = CMD_STRING_JAR + " [-h] [" + UDP_STRING + " | " +
-                                              SERIAL_STRING + "] [" + RATE_STRING + "] [" + AP_STRING + "] [" + MAG_STRING + "] " +
-                                              "[" + QGC_STRING + "] [" + GIMBAL_STRING + "] [" + GUI_AA_STRING + "] [" + GUI_MAX_STRING + "] [" +
-                                              GUI_VIEW_STRING + "] [" + REP_STRING + "] [" + PRINT_INDICATION_STRING + "]";
+    public final static String USAGE_STRING = CMD_STRING_JAR + " [-h] [" +
+                                              UDP_STRING + " | " +
+                                              SERIAL_STRING + "] [" +
+                                              RATE_STRING + "] [" +
+                                              AP_STRING + "] [" +
+                                              MAG_STRING + "] " + "[" +
+                                              QGC_STRING + "] [" +
+                                              GIMBAL_STRING + "] [" +
+                                              GUI_AA_STRING + "] [" +
+                                              GUI_MAX_STRING + "] [" +
+                                              GUI_VIEW_STRING + "] [" +
+                                              REP_STRING + "] [" +
+                                              PRINT_INDICATION_STRING + "]";
 
     public static void main(String[] args)
     throws InterruptedException, IOException {
