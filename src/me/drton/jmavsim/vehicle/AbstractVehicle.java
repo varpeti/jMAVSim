@@ -119,9 +119,9 @@ public abstract class AbstractVehicle extends DynamicObject implements Reporting
      *
      * @param sensors
      */
-    public void setSensors(Sensors sensors) {
+    public void setSensors(Sensors sensors, long t) {
         this.sensors = sensors;
-        sensors.setObject(this);
+        sensors.setObject(this, t);
     }
 
     public Sensors getSensors() {

@@ -55,10 +55,10 @@ public class SimpleSensors implements Sensors {
     }
 
     @Override
-    public void setObject(DynamicObject object) {
+    public void setObject(DynamicObject object, long t) {
         this.object = object;
         globalProjector.init(object.getWorld().getGlobalReference());
-        setGlobalPosition(null);
+        setGlobalPosition(null, t);
     }
 
     public void setGPSStartTime(long time) {
@@ -161,12 +161,11 @@ public class SimpleSensors implements Sensors {
         return globalPosition;
     }
 
-    public void setGlobalPosition(Vector3d pos) {
+    public void setGlobalPosition(Vector3d pos, long t) {
         if (pos == null) {
             pos = object.getPosition();
         }
 
-        long t = System.currentTimeMillis();
         double dt = 0.0;
         if (prevUpdateTime > 0) {
             dt = (t - this.prevUpdateTime) * 1e-3;
@@ -203,7 +202,7 @@ public class SimpleSensors implements Sensors {
     @Override
     public void update(long t) {
         float eph, epv;
-        setGlobalPosition(null);
+        setGlobalPosition(null, t);
 
         // GPS
         if (gpsStartTime > -1 && t > gpsStartTime && gpsNext <= t) {
@@ -218,7 +217,7 @@ public class SimpleSensors implements Sensors {
             gpsCurrent.epv = epv;
             gpsCurrent.velocity = new Vector3d(object.getVelocity());
             gpsCurrent.fix = eph <= fix3Deph ? 3 : eph <= fix2Deph ? 2 : 0;
-            gpsCurrent.time = System.currentTimeMillis() * 1000;
+            gpsCurrent.time = t * 1000;
             gps = gpsDelayLine.getOutput(t, gpsCurrent);
         }
     }

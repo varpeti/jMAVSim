@@ -33,7 +33,7 @@ public class LogPlayerSensors implements Sensors {
     }
 
     @Override
-    public void setObject(DynamicObject object) {
+    public void setObject(DynamicObject object, long t) {
     }
 
     @Override

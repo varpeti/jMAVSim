@@ -346,12 +346,12 @@ public class Simulator implements Runnable {
         SimpleSensors sensors = new SimpleSensors();
         sensors.setGPSInterval(50);
         sensors.setGPSDelay(200);
-        sensors.setGPSStartTime(System.currentTimeMillis() + 300);
+        sensors.setGPSStartTime(getMillis() + 300);
         sensors.setNoise_Acc(0.05f);
         sensors.setNoise_Gyo(0.01f);
         sensors.setNoise_Mag(0.005f);
         sensors.setNoise_Prs(0.1f);
-        vehicle.setSensors(sensors);
+        vehicle.setSensors(sensors, getMillis());
         //v.setDragRotate(0.1);
 
         return vehicle;
@@ -384,7 +384,7 @@ public class Simulator implements Runnable {
         sensors.setNoise_Mag(0.005f);
         sensors.setNoise_Prs(0.01f);
 
-        vehicle.setSensors(sensors);
+        vehicle.setSensors(sensors, getMillis());
 
         return vehicle;
     }
@@ -401,7 +401,7 @@ public class Simulator implements Runnable {
 
     public void run() {
         try {
-            world.update(System.currentTimeMillis());
+            world.update(getMillis());
         } catch (Exception e) {
             System.err.println("Exception in Simulator.world.update() : ");
             e.printStackTrace();
@@ -466,6 +466,10 @@ public class Simulator implements Runnable {
         }
 
         return magField;
+    }
+
+    private long getMillis() {
+        return System.currentTimeMillis();
     }
 
     public final static String PRINT_INDICATION_STRING = "-m [<MsgID[, MsgID]...>]";
