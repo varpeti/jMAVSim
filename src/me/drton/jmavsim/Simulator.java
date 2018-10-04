@@ -443,8 +443,8 @@ public class Simulator implements Runnable {
 
         if (vals.length > 3) {
             try {
-                decl = new Double(vals[1]);
-                incl = new Double(vals[2]);
+                decl = Double.valueOf(vals[1]);
+                incl = Double.valueOf(vals[2]);
             } catch (NumberFormatException e) {
                 System.err.println("Error parsing response: " + resp + "\n");
                 return magField;

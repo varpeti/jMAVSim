@@ -96,12 +96,12 @@ public class SensorParamPanel extends JPanel {
         this.sensors = sensors;
 
         // init value
-        accelSpinner.setValue(new Double(sensors.param("noise_Acc")));
-        gyroSpinner.setValue(new Double(sensors.param("noise_Gyo")));
-        magSpinner.setValue(new Double(sensors.param("noise_Mag")));
-        presSpinner.setValue(new Double(sensors.param("noise_Prs")));
-        gpsSpinner.setValue(new Double(sensors.param("gpsNoiseStdDev")));
-        massSpinner.setValue(new Double(sensors.param("mass")));
+        accelSpinner.setValue(Double.valueOf(sensors.param("noise_Acc")));
+        gyroSpinner.setValue(Double.valueOf(sensors.param("noise_Gyo")));
+        magSpinner.setValue(Double.valueOf(sensors.param("noise_Mag")));
+        presSpinner.setValue(Double.valueOf(sensors.param("noise_Prs")));
+        gpsSpinner.setValue(Double.valueOf(sensors.param("gpsNoiseStdDev")));
+        massSpinner.setValue(Double.valueOf(sensors.param("mass")));
 
     }
 
