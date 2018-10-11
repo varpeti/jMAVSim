@@ -48,7 +48,7 @@ public class Simulator implements Runnable {
     public static boolean DEBUG_MODE = false;
 
     public static final int    DEFAULT_SIM_RATE = 500; // Hz
-    public static final int    DEFAULT_SPEED_FACTOR = 1;
+    public static final double    DEFAULT_SPEED_FACTOR = 1.0;
     public static final int    DEFAULT_AUTOPILOT_SYSID =
         -1; // System ID of autopilot to communicate with. -1 to auto set ID on first received heartbeat.
     public static final String DEFAULT_AUTOPILOT_TYPE = "generic";  // eg. "px4" or "aq"
@@ -94,7 +94,7 @@ public class Simulator implements Runnable {
 
 
     private static int sleepInterval = (int)1e6 / DEFAULT_SIM_RATE;  // Main loop interval, in us
-    private static int speedFactor = DEFAULT_SPEED_FACTOR;
+    private static double speedFactor = DEFAULT_SPEED_FACTOR;
     private static int autopilotSysId = DEFAULT_AUTOPILOT_SYSID;
     private static String autopilotType = DEFAULT_AUTOPILOT_TYPE;
     private static String autopilotIpAddress = LOCAL_HOST;
@@ -294,7 +294,7 @@ public class Simulator implements Runnable {
             }
         }
 
-        thisHandle = executor.scheduleAtFixedRate(this, 0, sleepInterval, TimeUnit.MICROSECONDS);
+        thisHandle = executor.scheduleAtFixedRate(this, 0, (int)(sleepInterval / speedFactor), TimeUnit.MICROSECONDS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -667,9 +667,9 @@ public class Simulator implements Runnable {
                 }
             } else if (arg.equals("-f")) {
                 if (i < args.length) {
-                    int f;
+                    double f;
                     try {
-                        f = Integer.parseInt(args[i++]);
+                        f = Double.parseDouble(args[i++]);
                     } catch (NumberFormatException e) {
                         System.err.println("Expected numeric argument after -f: " + SPEED_FACTOR_STRING);
                         return;
@@ -744,7 +744,7 @@ public class Simulator implements Runnable {
         System.out.println("      Refresh rate at which jMAVSim runs. This dictates the frequency");
         System.out.println("      of the HIL_SENSOR messages. Default is " + DEFAULT_SIM_RATE + " Hz");
         System.out.println(SPEED_FACTOR_STRING);
-        System.out.println("      Speed factor at which jMAVSim runs. A factor of 2 means the system");
+        System.out.println("      Speed factor at which jMAVSim runs. A factor of 2.0 means the system");
         System.out.println("      runs double than real time speed. Default is " + DEFAULT_SPEED_FACTOR);
         System.out.println(AP_STRING);
         System.out.println("      Specify the MAV type. E.g. 'px4' or 'aq'. Default is: " + autopilotType +
