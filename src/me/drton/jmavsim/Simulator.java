@@ -117,9 +117,9 @@ public class Simulator implements Runnable {
     private World world;
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     private SystemOutHandler outputHandler;
-    private volatile long initialMillis = 0;
 //  private int simDelayMax = 500;  // Max delay between simulated and real time to skip samples in simulator, in ms
 
+    private long simTimeUs = 0;
     public volatile boolean shutdown = false;
 
     public Simulator() throws IOException, InterruptedException {
@@ -382,7 +382,6 @@ public class Simulator implements Runnable {
         SimpleSensors sensors = new SimpleSensors();
         sensors.setGPSInterval(50);
         sensors.setGPSDelay(0);  // [ms]
-        //sensors.setGPSStartTime(-1);
         //sensors.setPressureAltOffset(world.getGlobalReference().alt);
         sensors.setNoise_Acc(0.02f);
         sensors.setNoise_Gyo(0.001f);
@@ -407,6 +406,7 @@ public class Simulator implements Runnable {
     public void run() {
         try {
             world.update(getMillis());
+            advanceTime();
         } catch (Exception e) {
             System.err.println("Exception in Simulator.world.update() : ");
             e.printStackTrace();
@@ -474,19 +474,14 @@ public class Simulator implements Runnable {
     }
 
     public long getMillis() {
-        long millis = System.currentTimeMillis();
-
-        if (initialMillis == 0) {
-            initialMillis = millis;
-            return millis;
+        if (simTimeUs == 0) {
+            simTimeUs = System.currentTimeMillis() * 1000;
         }
+        return simTimeUs / 1000;
+    }
 
-        if (speedFactor == 1) {
-            return millis;
-        } else {
-            return ((millis - initialMillis) * speedFactor) + initialMillis;
-        }
-
+    private void advanceTime() {
+        simTimeUs += sleepInterval;
     }
 
     public final static String PRINT_INDICATION_STRING = "-m [<MsgID[, MsgID]...>]";
