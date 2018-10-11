@@ -158,6 +158,7 @@ public class Simulator implements Runnable {
         // Create GUI
         System.out.println("Starting GUI...");  // this is the longest part of startup so let user know
         visualizer = new Visualizer3D(world);
+        visualizer.setSimulator(this);
         visualizer.setAAEnabled(GUI_ENABLE_AA);
         if (GUI_START_MAXIMIZED) {
             visualizer.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -252,6 +253,7 @@ public class Simulator implements Runnable {
         // Create MAVLink HIL system
         // SysId should be the same as autopilot, ComponentId should be different!
         hilSystem = new MAVLinkHILSystem(schema, autopilotSysId, 51, vehicle);
+        hilSystem.setSimulator(this);
         //hilSystem.setHeartbeatInterval(0);
         connHIL.addNode(hilSystem);
         world.addObject(vehicle);
@@ -471,7 +473,7 @@ public class Simulator implements Runnable {
         return magField;
     }
 
-    private long getMillis() {
+    public long getMillis() {
         long millis = System.currentTimeMillis();
 
         if (initialMillis == 0) {

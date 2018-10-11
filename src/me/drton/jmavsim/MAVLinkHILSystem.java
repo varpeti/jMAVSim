@@ -18,6 +18,7 @@ import java.util.TimeZone;
  * MAVLinkHILSystem should have the same sysID as the autopilot, but different componentId.
  */
 public class MAVLinkHILSystem extends MAVLinkSystem {
+    private Simulator simulator;
     private AbstractVehicle vehicle;
     private boolean gotHeartBeat = false;
     private boolean inited = false;
@@ -43,10 +44,14 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
         this.vehicle = vehicle;
     }
 
+    public void setSimulator(Simulator simulator) {
+        this.simulator = simulator;
+    }
+
     @Override
     public void handleMessage(MAVLinkMessage msg) {
         super.handleMessage(msg);
-        long t = System.currentTimeMillis();
+        long t = simulator.getMillis();
         if ("HIL_ACTUATOR_CONTROLS".equals(msg.getMsgName())) {
             gotHilActuatorControls = true;
             List<Double> control = new ArrayList<Double>();
@@ -132,7 +137,7 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
         msg.set("base_mode", 32);     // HIL, disarmed
         sendMessage(msg);
         if (vehicle.getSensors().getGPSStartTime() == -1) {
-            vehicle.getSensors().setGPSStartTime(System.currentTimeMillis() + 1000);
+            vehicle.getSensors().setGPSStartTime(simulator.getMillis() + 1000);
         }
         stopped = false;
         inited = true;
