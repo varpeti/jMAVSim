@@ -120,6 +120,7 @@ public class Simulator implements Runnable {
 //  private int simDelayMax = 500;  // Max delay between simulated and real time to skip samples in simulator, in ms
 
     private long simTimeUs = 0;
+    private volatile boolean paused = false;
     public volatile boolean shutdown = false;
 
     public Simulator() throws IOException, InterruptedException {
@@ -334,6 +335,11 @@ public class Simulator implements Runnable {
         }
 
         System.exit(0);
+
+    }
+
+    public void pauseToggle() {
+        paused = !paused;
     }
 
     private AbstractMulticopter buildMulticopter() {
@@ -403,6 +409,10 @@ public class Simulator implements Runnable {
     }
 
     public void run() {
+        if (paused) {
+            return;
+        }
+
         try {
             world.update(getMillis());
             advanceTime();
@@ -785,6 +795,7 @@ public class Simulator implements Runnable {
         System.out.println("   T   - Toggle data report updates.");
         System.out.println("   D   - Toggle sensor parameter control sidebar.");
         System.out.println("   F1  - Show this key commands reference.");
+        System.out.println("   P   - Pause simulation.");
         System.out.println("  ESC  - Exit jMAVSim.");
         System.out.println(" SPACE - Reset vehicle & view to start position.");
         System.out.println("");
