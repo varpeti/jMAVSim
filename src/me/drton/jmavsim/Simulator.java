@@ -32,7 +32,13 @@ import java.util.concurrent.ScheduledFuture;;
  */
 public class Simulator implements Runnable {
 
-    public static boolean   USE_SERIAL_PORT       = false;  // use serial port for MAV instead of UDP
+    private static enum Port {
+        SERIAL,
+        UDP,
+        TCP
+    }
+    private static Port PORT = Port.UDP;
+
     public static boolean   COMMUNICATE_WITH_QGC  = true;   // open UDP port to QGC
     public static boolean   DO_MAG_FIELD_LOOKUP   =
         false;  // perform online mag incl/decl lookup for current position
@@ -92,7 +98,6 @@ public class Simulator implements Runnable {
     public static Double DEFAULT_CAM_ROLL_SCAL  =
         1.57;  // channel value to physical movement (+/-90 deg)
 
-
     private static int sleepInterval = (int)1e6 / DEFAULT_SIM_RATE;  // Main loop interval, in us
     private static double speedFactor = DEFAULT_SPEED_FACTOR;
     private static int autopilotSysId = DEFAULT_AUTOPILOT_SYSID;
@@ -106,6 +111,7 @@ public class Simulator implements Runnable {
 
     private static HashSet<Integer> monitorMessageIds = new HashSet<Integer>();
     private static boolean monitorMessage = false;
+
 
     private Visualizer3D visualizer;
     private AbstractMulticopter vehicle;
@@ -191,18 +197,24 @@ public class Simulator implements Runnable {
         world.addObject(connCommon);
 
         // Create ports
-        if (USE_SERIAL_PORT) {
-            //Serial port: connection to autopilot over serial.
+        if (PORT == Port.SERIAL) {
             SerialMAVLinkPort port = new SerialMAVLinkPort(schema);
             port.setup(serialPath, serialBaudRate, 8, 1, 0);
             port.setDebug(DEBUG_MODE);
             autopilotMavLinkPort = port;
+
+        } else if (PORT == Port.TCP) {
+            TCPMavLinkPort port = new TCPMavLinkPort(schema);
+            port.setDebug(DEBUG_MODE);
+            port.setup(autopilotIpAddress, autopilotPort);
+            if (monitorMessage) {
+                port.setMonitorMessageID(monitorMessageIds);
+            }
+            autopilotMavLinkPort = port;
         } else {
             UDPMavLinkPort port = new UDPMavLinkPort(schema);
             port.setDebug(DEBUG_MODE);
-            port.setup(autopilotIpAddress,
-                       autopilotPort); // default source port 0 for autopilot, which is a client of JMAVSim
-            // monitor certain mavlink messages.
+            port.setup(autopilotIpAddress, autopilotPort);
             if (monitorMessage) {
                 port.setMonitorMessageID(monitorMessageIds);
             }
@@ -218,7 +230,7 @@ public class Simulator implements Runnable {
         if (COMMUNICATE_WITH_QGC) {
             udpGCMavLinkPort.setup(qgcIpAddress, qgcPeerPort);
             udpGCMavLinkPort.setDebug(DEBUG_MODE);
-            if (monitorMessage && USE_SERIAL_PORT) {
+            if (monitorMessage && PORT == Port.SERIAL) {
                 udpGCMavLinkPort.setMonitorMessageID(monitorMessageIds);
             }
             connCommon.addNode(udpGCMavLinkPort);
@@ -495,6 +507,7 @@ public class Simulator implements Runnable {
 
     public final static String PRINT_INDICATION_STRING = "-m [<MsgID[, MsgID]...>]";
     public final static String UDP_STRING = "-udp <mav ip>:<mav port>";
+    public final static String TCP_STRING = "-tcp <mav ip>:<mav port>";
     public final static String QGC_STRING = "-qgc <qgc ip address>:<qgc peer port>";
     public final static String SERIAL_STRING = "-serial [<path> <baudRate>]";
     public final static String MAG_STRING = "-automag";
@@ -561,7 +574,7 @@ public class Simulator implements Runnable {
                     continue;
                 }
             } else if (arg.equalsIgnoreCase("-udp")) {
-                USE_SERIAL_PORT = false;
+                PORT = Port.UDP;
                 if (i == args.length) {
                     // only arg is -udp, so use default values.
                     break;
@@ -590,8 +603,38 @@ public class Simulator implements Runnable {
                     System.err.println("-udp needs an argument: " + UDP_STRING);
                     return;
                 }
+            } else if (arg.equalsIgnoreCase("-tcp")) {
+                PORT = Port.TCP;
+                if (i == args.length) {
+                    // only arg is -tcp, so use default values.
+                    break;
+                }
+                if (i < args.length) {
+                    String nextArg = args[i++];
+                    if (nextArg.startsWith("-")) {
+                        // only turning on udp, but want to use default ports
+                        i--;
+                        continue;
+                    }
+                    try {
+                        // try to parse passed-in ports.
+                        String[] list = nextArg.split(":");
+                        if (list.length != 2) {
+                            System.err.println("Expected: " + TCP_STRING + ", got: " + Arrays.toString(list));
+                            return;
+                        }
+                        autopilotIpAddress = list[0];
+                        autopilotPort = Integer.parseInt(list[1]);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Expected: " + USAGE_STRING + ", got: " + e.toString());
+                        return;
+                    }
+                } else {
+                    System.err.println("-tcp needs an argument: " + TCP_STRING);
+                    return;
+                }
             } else if (arg.equals("-serial")) {
-                USE_SERIAL_PORT = true;
+                PORT = Port.SERIAL;
                 if (i >= args.length) {
                     // only arg is -serial, so use default values
                     break;
