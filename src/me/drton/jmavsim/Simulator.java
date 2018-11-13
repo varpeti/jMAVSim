@@ -127,6 +127,9 @@ public class Simulator implements Runnable {
 
     private long simTimeUs = 0;
     private volatile boolean paused = false;
+    private long lastTimeRan = 0;
+    private int checkFactor = 2;
+    private int slowDownCounter = 0;
     public volatile boolean shutdown = false;
 
     public Simulator() throws IOException, InterruptedException {
@@ -306,7 +309,8 @@ public class Simulator implements Runnable {
             }
         }
 
-        thisHandle = executor.scheduleAtFixedRate(this, 0, (int)(sleepInterval / speedFactor), TimeUnit.MICROSECONDS);
+        thisHandle = executor.scheduleAtFixedRate(this, 0, (int)(sleepInterval / speedFactor / checkFactor),
+                                                  TimeUnit.MICROSECONDS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -373,7 +377,7 @@ public class Simulator implements Runnable {
         sensors.setNoise_Gyo(0.01f);
         sensors.setNoise_Mag(0.005f);
         sensors.setNoise_Prs(0.1f);
-        vehicle.setSensors(sensors, getMillis());
+        vehicle.setSensors(sensors, getSimMillis());
         //v.setDragRotate(0.1);
 
         return vehicle;
@@ -405,7 +409,7 @@ public class Simulator implements Runnable {
         sensors.setNoise_Mag(0.005f);
         sensors.setNoise_Prs(0.01f);
 
-        vehicle.setSensors(sensors, getMillis());
+        vehicle.setSensors(sensors, getSimMillis());
 
         return vehicle;
     }
@@ -425,14 +429,28 @@ public class Simulator implements Runnable {
             return;
         }
 
-        try {
-            world.update(getMillis());
+        boolean ioRunOnly = (slowDownCounter % checkFactor != 0);
+
+        if (!hilSystem.gotHilActuatorControls() && !ioRunOnly) {
             advanceTime();
+        }
+
+        long now = getSimMillis();
+
+        boolean needsToPause = ((lastTimeRan == now) || ioRunOnly);
+
+        try {
+            world.update(now, needsToPause);
         } catch (Exception e) {
             System.err.println("Exception in Simulator.world.update() : ");
             e.printStackTrace();
             executor.shutdown();
         }
+
+        if (!needsToPause) {
+            lastTimeRan = now;
+        }
+        slowDownCounter++;
     }
 
     /**
@@ -494,14 +512,18 @@ public class Simulator implements Runnable {
         return magField;
     }
 
-    public long getMillis() {
+    public long getSimMillis() {
         if (simTimeUs == 0) {
             simTimeUs = System.currentTimeMillis() * 1000;
         }
         return simTimeUs / 1000;
     }
 
-    private void advanceTime() {
+    public long getRealMillis() {
+        return System.currentTimeMillis();
+    }
+
+    public void advanceTime() {
         simTimeUs += sleepInterval;
     }
 
