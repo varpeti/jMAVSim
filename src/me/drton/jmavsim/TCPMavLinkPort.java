@@ -18,7 +18,9 @@ import java.util.*;
 public class TCPMavLinkPort extends MAVLinkPort {
     private MAVLinkSchema schema;
     private ByteBuffer rxBuffer = ByteBuffer.allocate(8192);
+    private InetSocketAddress inetSocketAddress = null;
     private ServerSocketChannel serverSocketChannel = null;
+    private SocketChannel socketChannel = null;
     private MAVLinkStream stream;
     private boolean debug = false;
 
@@ -50,29 +52,45 @@ public class TCPMavLinkPort extends MAVLinkPort {
     }
 
     public void setup(String address, int port) throws UnknownHostException, IOException {
-        //this.serverSocket = new ServerSocket(port);
-        serverSocketChannel = ServerSocketChannel.open();
-        serverSocketChannel.socket().bind(new InetSocketAddress(port));
-
-        //if (debug) {
-        //    System.out.println("adress: " + serverSocket.toString());
-        //}
+        inetSocketAddress = new InetSocketAddress(port);
     }
 
     public void open() throws IOException {
-        //System.out.println("before accept");
-        //connectionSocket = serverSocket.accept();
-        //System.out.println("after accept");
-        //DataInputStream dIn = new DataInputStream(connectionSocket.getInputStream());
-        //
-        SocketChannel socketChannel = serverSocketChannel.accept();
-        socketChannel.configureBlocking(false);
-        //ByteChannel channel = socketChannel.getchannel();
-        //if (channel == null) {
-        //    System.out.println("channel is null");
-        //}
+        serverSocketChannel = ServerSocketChannel.open();
+        serverSocketChannel.socket().bind(inetSocketAddress);
+        accept();
         stream = new MAVLinkStream(schema, socketChannel);
-        stream.setDebug(debug);
+        stream.setDebug(true);
+    }
+
+    private void accept() {
+        if (debug) {
+            System.out.println("Waiting to accept TCP connection");
+        }
+
+        try {
+            socketChannel = serverSocketChannel.accept();
+            socketChannel.configureBlocking(false);
+            socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, true);
+        } catch (IOException ignored) {
+        }
+
+        if (debug) {
+            System.out.println("TCP connection accepted");
+        }
+    }
+
+    private void reset() {
+        if (debug) {
+            System.out.println("Reseting TCP connection.");
+        }
+
+        try {
+            close();
+            open();
+        } catch (IOException e) {
+            System.err.println("Reset failed: " + e);
+        }
     }
 
     @Override
@@ -87,21 +105,20 @@ public class TCPMavLinkPort extends MAVLinkPort {
 
     @Override
     public void handleMessage(MAVLinkMessage msg) {
-        if (debug) { System.out.println("[handleMessage] msg.name: " + msg.getMsgName() + ", type: " + msg.getMsgType()); }
-
-        //try {
-        //    /*SocketAddress remote =*/ channel.getRemoteAddress();
-        //} catch (IOException e) {
-        //    System.err.println(e.toString());
-        //}
-
+        if (debug) {
+            System.out.println("[handleMessage] msg.name: " + msg.getMsgName() + ", type: " + msg.getMsgType());
+        }
 
         if (isOpened()) {
             try {
                 stream.write(msg);
                 IndicateReceivedMessage(msg.getMsgType());
             } catch (IOException ignored) {
-                // Silently ignore this exception, we likely just have nobody on this port yet/already
+                // This can happen when px4 shuts down and the connection is dropped.
+                if (debug) {
+                    System.out.println("got exception: " + ignored);
+                }
+                reset();
             }
         }
     }
@@ -151,8 +168,12 @@ public class TCPMavLinkPort extends MAVLinkPort {
                 }
                 IndicateReceivedMessage(msg.getMsgType());
                 sendMessage(msg);
-            } catch (IOException e) {
-                // Silently ignore this exception, we likely just have nobody on this port yet/already
+            } catch (IOException ignored) {
+                // This can happen when px4 shuts down and the connection is dropped.
+                if (debug) {
+                    System.out.println("Received IOException");
+                }
+                reset();
                 return;
             }
         }
