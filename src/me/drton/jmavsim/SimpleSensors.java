@@ -228,50 +228,38 @@ public class SimpleSensors implements Sensors {
 
     @Override
     public void setParameter(String name, float value) {
-        if ( name.equals("noise_Acc") ) {
+        if (name.equals("noise_Acc")) {
             noise_Acc = value;
-        }
-        else if ( name.equals("noise_Gyo") ) {
+        } else if (name.equals("noise_Gyo")) {
             noise_Gyo = value;
-        }
-        else if ( name.equals("noise_Mag") ) {
+        } else if (name.equals("noise_Mag")) {
             noise_Mag = value;
-        }
-        else if ( name.equals("noise_Prs") ) {
+        } else if (name.equals("noise_Prs")) {
             noise_Prs = value;
-        }
-        else if ( name.equals("gpsNoiseStdDev") ) {
+        } else if (name.equals("gpsNoiseStdDev")) {
             gpsNoiseStdDev = value;
-        }
-        else if ( name.equals("mass")) {
+        } else if (name.equals("mass")) {
             object.setMass((double)value);
-        }
-        else {
+        } else {
             System.out.printf("ERROR: unknown param");
         }
     }
 
     @Override
     public float param(String name) {
-        if ( name.equals("noise_Acc") ) {
+        if (name.equals("noise_Acc")) {
             return noise_Acc;
-        }
-        else if ( name.equals("noise_Gyo") ) {
+        } else if (name.equals("noise_Gyo")) {
             return noise_Gyo;
-        }
-        else if ( name.equals("noise_Mag") ) {
+        } else if (name.equals("noise_Mag")) {
             return noise_Mag;
-        }
-        else if ( name.equals("noise_Prs") ) {
+        } else if (name.equals("noise_Prs")) {
             return noise_Prs;
-        }
-        else if ( name.equals("gpsNoiseStdDev") ) {
+        } else if (name.equals("gpsNoiseStdDev")) {
             return gpsNoiseStdDev;
-        }
-        else if ( name.equals("mass") ) {
+        } else if (name.equals("mass")) {
             return (float)object.getMass();
-        }
-        else {
+        } else {
             System.out.printf("ERROR: unknown param");
         }
 

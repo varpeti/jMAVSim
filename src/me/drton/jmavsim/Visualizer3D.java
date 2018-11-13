@@ -500,14 +500,12 @@ public class Visualizer3D extends JFrame {
     public void toggleSensorControlDialog() {
         if (sensorParamPanel == null || vehicleViewObject == null) {
             return;
-        }
-        else if (this.sensorParamPanel.isShowing()) {
+        } else if (this.sensorParamPanel.isShowing()) {
             sensorParamPanel.setSensor(vehicleViewObject.getSensors());
             sensorParamPanel.setVisible(false);
             propertySplitPane.setLeftComponent(null);
             propertySplitPane.setDividerSize(0);
-        }
-        else {
+        } else {
             sensorParamPanel.setSensor(vehicleViewObject.getSensors());
             sensorParamPanel.setVisible(true);
             propertySplitPane.setLeftComponent(sensorParamPanel);
