@@ -148,11 +148,6 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
     }
 
     public void initMavLink() {
-        // Set HIL mode
-        MAVLinkMessage msg = new MAVLinkMessage(schema, "SET_MODE", sysId, componentId, protocolVersion);
-        msg.set("target_system", sysId);
-        msg.set("base_mode", 32);     // HIL, disarmed
-        sendMessage(msg);
         if (vehicle.getSensors().getGPSStartTime() == -1) {
             vehicle.getSensors().setGPSStartTime(simulator.getSimMillis() + 1000);
         }
@@ -164,11 +159,6 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
         if (!inited) {
             return;
         }
-        // Send message to end HIL mode
-        MAVLinkMessage msg = new MAVLinkMessage(schema, "SET_MODE", sysId, componentId, protocolVersion);
-        msg.set("target_system", sysId);
-        msg.set("base_mode", 0);     // disarmed
-        sendMessage(msg);
         inited = false;
         gotHeartBeat = false;
         stopped = true;
