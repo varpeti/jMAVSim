@@ -32,7 +32,7 @@ public class ReportUpdater extends WorldObject {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         if (t < nextUpdateT) {
             return;
         }

@@ -97,11 +97,14 @@ public abstract class AbstractMulticopter extends AbstractVehicle {
     }
 
     @Override
-    public void update(long t) {
-        for (Rotor rotor : rotors) {
-            rotor.update(t);
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
         }
-        super.update(t);
+        for (Rotor rotor : rotors) {
+            rotor.update(t, paused);
+        }
+        super.update(t, paused);
         for (int i = 0; i < rotors.length; i++) {
             double c = control.size() > i ? control.get(i) : 0.0;
             rotors[i].setControl(c);

@@ -200,7 +200,11 @@ public class SimpleSensors implements Sensors {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
+        }
+
         float eph, epv;
         setGlobalPosition(null, t);
 

@@ -34,7 +34,7 @@ public interface Sensors {
 
     long getGPSStartTime();
 
-    void update(long t);
+    void update(long t, boolean paused);
 
     void setParameter(String name, float value);
 

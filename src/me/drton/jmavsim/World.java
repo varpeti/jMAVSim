@@ -28,9 +28,9 @@ public class World {
         return environment;
     }
 
-    public synchronized void update(long t) {
+    public synchronized void update(long t, boolean paused) {
         for (WorldObject obj : objects) {
-            obj.update(t);
+            obj.update(t, paused);
         }
     }
 

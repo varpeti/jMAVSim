@@ -10,7 +10,7 @@ public abstract class WorldObject {
         this.world = world;
     }
 
-    public abstract void update(long t);
+    public abstract void update(long t, boolean paused);
 
     public World getWorld() {
         return world;

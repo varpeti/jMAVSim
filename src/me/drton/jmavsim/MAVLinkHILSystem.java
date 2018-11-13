@@ -159,8 +159,13 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
     }
 
     @Override
-    public void update(long t) {
-        super.update(t);
+    public void update(long t, boolean paused) {
+        super.update(t, paused);
+
+        if (paused) {
+            return;
+        }
+
         long tu = t * 1000; // Time in us
 
         if (!this.inited) {

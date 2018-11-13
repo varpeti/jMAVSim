@@ -133,7 +133,7 @@ public class UDPMavLinkPort extends MAVLinkPort {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         while (isOpened()) {
             try {
                 MAVLinkMessage msg = stream.read();

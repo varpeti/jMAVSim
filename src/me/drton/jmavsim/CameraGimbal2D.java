@@ -113,7 +113,7 @@ public class CameraGimbal2D extends KinematicObject implements ReportingObject {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         this.position = (Vector3d) baseObject.position.clone();
         this.attitude = (Vector3d) baseObject.attitude.clone();
         this.rotation.rotZ(this.attitude.z);

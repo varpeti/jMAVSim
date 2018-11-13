@@ -87,7 +87,7 @@ public class LogPlayerSensors implements Sensors {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         if (logReader != null) {
             Map<String, Object> logData = new HashMap<String, Object>();
             while (logStart + logT < t) {
