@@ -32,5 +32,5 @@ public abstract class MAVLinkNode {
 
     public abstract void handleMessage(MAVLinkMessage msg);
 
-    public abstract void update(long t);
+    public abstract void update(long t, boolean paused);
 }

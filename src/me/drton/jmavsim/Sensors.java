@@ -8,7 +8,7 @@ import me.drton.jmavlib.geo.LatLonAlt;
  * User: ton Date: 26.11.13 Time: 13:32
  */
 public interface Sensors {
-    void setObject(DynamicObject object);
+    void setObject(DynamicObject object, long t);
 
     Vector3d getAcc();
 
@@ -34,7 +34,7 @@ public interface Sensors {
 
     long getGPSStartTime();
 
-    void update(long t);
+    void update(long t, boolean paused);
 
     void setParameter(String name, float value);
 

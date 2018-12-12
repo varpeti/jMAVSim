@@ -33,7 +33,10 @@ public class SimpleEnvironment extends Environment {
         }
     }
 
-    public void update(long t) {
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
+        }
         double dt = lastTime == 0 ? 0.0 : (t - lastTime) / 1000.0;
         lastTime = t;
         Vector3d r = new Vector3d(windDeviation);

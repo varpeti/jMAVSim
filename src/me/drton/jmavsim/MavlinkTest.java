@@ -25,7 +25,7 @@ public class MavlinkTest {
             }
 
             @Override
-            public void update(long t) {
+            public void update(long t, boolean paused) {
             }
         };
         connection.addNode(node);
@@ -33,7 +33,7 @@ public class MavlinkTest {
         port.open();
         port.sendRaw("\nsh /etc/init.d/rc.usb\n".getBytes());
         while (true) {
-            port.update(System.currentTimeMillis());
+            port.update(System.currentTimeMillis(), false);
             Thread.sleep(10);
         }
     }

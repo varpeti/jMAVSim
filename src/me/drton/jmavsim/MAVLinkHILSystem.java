@@ -18,17 +18,16 @@ import java.util.TimeZone;
  * MAVLinkHILSystem should have the same sysID as the autopilot, but different componentId.
  */
 public class MAVLinkHILSystem extends MAVLinkSystem {
+    private Simulator simulator;
     private AbstractVehicle vehicle;
     private boolean gotHeartBeat = false;
     private boolean inited = false;
     private boolean stopped = false;
-    private long initTime = 0;
-    private long initDelay = 500;
-    private boolean gotHilActuatorControls =
-        false; //prefer HIL_ACTUATOR_CONTROLS in case we get both messages
+    private boolean gotHilActuatorControls = false;
     private long hilStateUpdateInterval = -1; //don't publish by default
     private long nextHilStatePub = 0;
     private long timeThrottleCounter = 0;
+    private long lastHeartbeatMs = 0;
 
     /**
      * Create MAVLinkHILSimulator, MAVLink system that sends simulated sensors to autopilot and passes controls from
@@ -43,10 +42,18 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
         this.vehicle = vehicle;
     }
 
+    public void setSimulator(Simulator simulator) {
+        this.simulator = simulator;
+    }
+
+    public boolean gotHilActuatorControls() {
+        return gotHilActuatorControls;
+    }
+
     @Override
     public void handleMessage(MAVLinkMessage msg) {
         super.handleMessage(msg);
-        long t = System.currentTimeMillis();
+        long t = simulator.getSimMillis();
         if ("HIL_ACTUATOR_CONTROLS".equals(msg.getMsgName())) {
             gotHilActuatorControls = true;
             List<Double> control = new ArrayList<Double>();
@@ -66,6 +73,8 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
                     armed = false;
                 }
             }
+
+            simulator.advanceTime();
 
             vehicle.setControl(control);
 
@@ -100,10 +109,20 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
                 }
             }
         } else if ("HEARTBEAT".equals(msg.getMsgName())) {
+            long realMs = simulator.getRealMillis();
+
+            // We timeout after 3 seconds and do a reset.
+            long diffMs = realMs - lastHeartbeatMs;
+            if (diffMs > 3000) {
+                if (gotHeartBeat) {
+                    System.out.println("Reseting after silence of " + diffMs + " ms");
+                }
+                reset();
+            }
+
             if (!gotHeartBeat && !stopped) {
                 if (sysId < 0 || sysId == msg.systemID) {
                     gotHeartBeat = true;
-                    initTime = t + initDelay;
                     if (sysId < 0) {
                         sysId = msg.systemID;
                     }
@@ -113,26 +132,24 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
                                        ". Please change the system ID parameter to match in order to use HITL/SITL.");
                 }
             }
-            if (gotHeartBeat && !inited && t > initTime) {
+            if (gotHeartBeat) {
                 System.out.println("Init MAVLink");
                 initMavLink();
             }
             if ((msg.getInt("base_mode") & 128) == 0) {
                 vehicle.setControl(Collections.<Double>emptyList());
             }
+
+            lastHeartbeatMs = realMs;
+
         } else if ("STATUSTEXT".equals(msg.getMsgName())) {
             System.out.println("MSG: " + msg.getString("text"));
         }
     }
 
     public void initMavLink() {
-        // Set HIL mode
-        MAVLinkMessage msg = new MAVLinkMessage(schema, "SET_MODE", sysId, componentId, protocolVersion);
-        msg.set("target_system", sysId);
-        msg.set("base_mode", 32);     // HIL, disarmed
-        sendMessage(msg);
         if (vehicle.getSensors().getGPSStartTime() == -1) {
-            vehicle.getSensors().setGPSStartTime(System.currentTimeMillis() + 1000);
+            vehicle.getSensors().setGPSStartTime(simulator.getSimMillis() + 1000);
         }
         stopped = false;
         inited = true;
@@ -142,11 +159,6 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
         if (!inited) {
             return;
         }
-        // Send message to end HIL mode
-        MAVLinkMessage msg = new MAVLinkMessage(schema, "SET_MODE", sysId, componentId, protocolVersion);
-        msg.set("target_system", sysId);
-        msg.set("base_mode", 0);     // disarmed
-        sendMessage(msg);
         inited = false;
         gotHeartBeat = false;
         stopped = true;
@@ -154,8 +166,13 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
     }
 
     @Override
-    public void update(long t) {
-        super.update(t);
+    public void update(long t, boolean paused) {
+        super.update(t, paused);
+
+        if (paused) {
+            return;
+        }
+
         long tu = t * 1000; // Time in us
 
         if (!this.inited) {
@@ -167,7 +184,7 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
         // Sensors
         MAVLinkMessage msg_sensor = new MAVLinkMessage(schema, "HIL_SENSOR", sysId, componentId,
                                                        protocolVersion);
-        msg_sensor.set("time_usec", 0);
+        msg_sensor.set("time_usec", tu);
         Vector3d tv = sensors.getAcc();
         msg_sensor.set("xacc", tv.x);
         msg_sensor.set("yacc", tv.y);
@@ -251,12 +268,20 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
 
         // SYSTEM TIME from host
         if (timeThrottleCounter++ % 1000 == 0) {
-            MAVLinkMessage msg_system_time = new MAVLinkMessage(schema, "SYSTEM_TIME", sysId, componentId, protocolVersion);
+            MAVLinkMessage msg_system_time = new MAVLinkMessage(schema, "SYSTEM_TIME", sysId, componentId,
+                                                                protocolVersion);
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
             msg_system_time.set("time_unix_usec", cal.getTimeInMillis() * 1000);
-            msg_system_time.set("time_boot_ms", tu/1000);
+            msg_system_time.set("time_boot_ms", tu / 1000);
             sendMessage(msg_system_time);
         }
     }
 
+    private void reset() {
+        gotHeartBeat = false;
+        inited = false;
+        stopped = false;
+        gotHilActuatorControls = false;
+        nextHilStatePub = 0;
+    }
 }

@@ -36,6 +36,8 @@
             <classpath refid="libsclasspath"/>
             <src path="src"/>
             <src path="jMAVlib/src"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-Xlint:unchecked"/>
         </javac>
     </target>
 
@@ -46,7 +48,7 @@
             </fileset>
         </jar>
     </target>
-	
+
     <target name="create_run_jar" depends="compile" description="Creates standalone runnable JAR file including dependencies.">
         <jar destfile="${build.dir}/jmavsim_run.jar">
             <manifest>
@@ -72,7 +74,7 @@
             <zipfileset dir="lib" includes="gluegen-rt-natives-linux-amd64.jar"/>
             <zipfileset dir="lib" includes="joal-natives-linux-amd64.jar"/>
             <zipfileset dir="lib" includes="jogl-all-natives-linux-amd64.jar"/>
-            <!-- 
+            <!--
             <zipfileset dir="lib" includes="gluegen-rt-natives-linux-i586.jar"/>
             <zipfileset dir="lib" includes="joal-natives-linux-i586.jar"/>
             <zipfileset dir="lib" includes="jogl-all-natives-linux-i586.jar"/>
@@ -84,15 +86,15 @@
             <zipfileset dir="lib" includes="gluegen-rt-natives-windows-amd64.jar"/>
             <zipfileset dir="lib" includes="joal-natives-windows-amd64.jar"/>
             <zipfileset dir="lib" includes="jogl-all-natives-windows-amd64.jar"/>
-            <!-- 
+            <!--
             <zipfileset dir="lib" includes="gluegen-rt-natives-windows-i586.jar"/>
             <zipfileset dir="lib" includes="joal-natives-windows-i586.jar"/>
-            <zipfileset dir="lib" includes="jogl-all-natives-windows-i586.jar"/> 
+            <zipfileset dir="lib" includes="jogl-all-natives-windows-i586.jar"/>
             -->
         </jar>
     </target>
 
-    <target name="copy_res" 
+    <target name="copy_res"
             description="Copies all supporting resource files into build folder, eg. to use jmavsim_run.jar or prepare for distro.">
         <copy todir="${build.dir}/" preservelastmodified="true" overwrite="false">
             <zipfileset dir="./" includes="${resource_list}" />

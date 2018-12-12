@@ -96,12 +96,12 @@ public class SensorParamPanel extends JPanel {
         this.sensors = sensors;
 
         // init value
-        accelSpinner.setValue(new Double(sensors.param("noise_Acc")));
-        gyroSpinner.setValue(new Double(sensors.param("noise_Gyo")));
-        magSpinner.setValue(new Double(sensors.param("noise_Mag")));
-        presSpinner.setValue(new Double(sensors.param("noise_Prs")));
-        gpsSpinner.setValue(new Double(sensors.param("gpsNoiseStdDev")));
-        massSpinner.setValue(new Double(sensors.param("mass")));
+        accelSpinner.setValue(Double.valueOf(sensors.param("noise_Acc")));
+        gyroSpinner.setValue(Double.valueOf(sensors.param("noise_Gyo")));
+        magSpinner.setValue(Double.valueOf(sensors.param("noise_Mag")));
+        presSpinner.setValue(Double.valueOf(sensors.param("noise_Prs")));
+        gpsSpinner.setValue(Double.valueOf(sensors.param("gpsNoiseStdDev")));
+        massSpinner.setValue(Double.valueOf(sensors.param("mass")));
 
     }
 
@@ -124,40 +124,68 @@ public class SensorParamPanel extends JPanel {
         mainPanel.setLayout(new GridLayoutManager(8, 2, new Insets(0, 0, 0, 0), -1, -1));
         final JLabel label1 = new JLabel();
         label1.setText("Accel Noise StdDev");
-        mainPanel.add(label1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         accelSpinner = new JSpinner();
-        mainPanel.add(accelSpinner, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(accelSpinner, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                        GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                        GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
         label2.setText("Gyro Noise StdDev");
-        mainPanel.add(label2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         gyroSpinner = new JSpinner();
-        mainPanel.add(gyroSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(gyroSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                       GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                       GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label3 = new JLabel();
         label3.setText("Mag Noise StdDev");
-        mainPanel.add(label3, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label3, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         final JLabel label4 = new JLabel();
         label4.setText("Pressure Noise StdDev");
-        mainPanel.add(label4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         final JLabel label5 = new JLabel();
         label5.setText("GPS Noise StdDev");
-        mainPanel.add(label5, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label5, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         magSpinner = new JSpinner();
-        mainPanel.add(magSpinner, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(magSpinner, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                      GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                      GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         presSpinner = new JSpinner();
-        mainPanel.add(presSpinner, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(presSpinner, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                       GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                       GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         gpsSpinner = new JSpinner();
-        mainPanel.add(gpsSpinner, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(gpsSpinner, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                      GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                      GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label6 = new JLabel();
         label6.setText("--- VEHICLE ---");
-        mainPanel.add(label6, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label6, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         final JLabel label7 = new JLabel();
         label7.setText("mass");
-        mainPanel.add(label7, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label7, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
         massSpinner = new JSpinner();
-        mainPanel.add(massSpinner, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(massSpinner, new GridConstraints(7, 1, 1, 1, GridConstraints.ANCHOR_WEST,
+                                                       GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW,
+                                                       GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label8 = new JLabel();
         label8.setText("--- SENSORS ---");
-        mainPanel.add(label8, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        mainPanel.add(label8, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER,
+                                                  GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null,
+                                                  null, null, 0, false));
     }
 
     /**

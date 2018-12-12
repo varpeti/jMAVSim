@@ -9,7 +9,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 public class PeripherialBuzzer {
-    BlockingQueue<Note> notes = new LinkedBlockingQueue();
+    BlockingQueue<Note> notes = new LinkedBlockingQueue<>();
     AudioFormat af;
     SourceDataLine sdl;
     float sample_rate = 44100; // assume a sample rate of 44.1 kHz
@@ -18,7 +18,7 @@ public class PeripherialBuzzer {
         public int frequency;
         public int duration;
         public Note(int frequency, int duration) {
-            this.frequency = new Integer(frequency);
+            this.frequency = Integer.valueOf(frequency);
             this.duration = duration;
         }
     }

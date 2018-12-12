@@ -39,9 +39,9 @@ public class MAVLinkConnection extends WorldObject {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         for (MAVLinkNode node : nodes) {
-            node.update(t);
+            node.update(t, paused);
         }
     }
 }

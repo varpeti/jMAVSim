@@ -25,7 +25,7 @@ public class SimpleTarget extends Target {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         double progress = Math.min(1.0, Math.max(0.0,
                                                  (double)(t - timeStart) / (double)(timeFinish - timeStart)));
         Vector3d vec = new Vector3d();

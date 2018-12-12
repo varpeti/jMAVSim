@@ -41,7 +41,10 @@ public abstract class DynamicObject extends KinematicObject {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
+        }
         if (lastTime >= 0) {
             double dt = Math.max((t - lastTime) / 1000.0, 0.001);  // constrain time step
             double grnd = getWorld().getEnvironment().getGroundLevelAt(position);

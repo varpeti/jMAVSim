@@ -136,7 +136,7 @@ public class SerialMAVLinkPort extends MAVLinkPort {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
         MAVLinkMessage msg;
         while (isOpened() && stream != null) {
             try {

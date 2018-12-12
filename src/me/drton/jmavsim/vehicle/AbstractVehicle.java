@@ -119,9 +119,9 @@ public abstract class AbstractVehicle extends DynamicObject implements Reporting
      *
      * @param sensors
      */
-    public void setSensors(Sensors sensors) {
+    public void setSensors(Sensors sensors, long t) {
         this.sensors = sensors;
-        sensors.setObject(this);
+        sensors.setObject(this, t);
     }
 
     public Sensors getSensors() {
@@ -138,10 +138,13 @@ public abstract class AbstractVehicle extends DynamicObject implements Reporting
     }
 
     @Override
-    public void update(long t) {
-        super.update(t);
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
+        }
+        super.update(t, paused);
         if (sensors != null) {
-            sensors.update(t);
+            sensors.update(t, paused);
         }
     }
 }

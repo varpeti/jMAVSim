@@ -88,6 +88,7 @@ public class Visualizer3D extends JFrame {
     private AbstractVehicle vehicleViewObject;
     private KinematicObject gimbalViewObject;
     private MAVLinkHILSystem hilSystem;
+    private Simulator simulator;
     private JSplitPane splitPane;
     private ReportPanel reportPanel;
     private JSplitPane propertySplitPane;
@@ -445,6 +446,15 @@ public class Visualizer3D extends JFrame {
     }
 
     /**
+     * Set the simulator being ran.
+     *
+     * @param simulator
+     */
+    public void setSimulator(Simulator simulator) {
+        this.simulator = simulator;
+    }
+
+    /**
      * Sets the text of the simulation report.
      *
      * @param text
@@ -490,14 +500,12 @@ public class Visualizer3D extends JFrame {
     public void toggleSensorControlDialog() {
         if (sensorParamPanel == null || vehicleViewObject == null) {
             return;
-        }
-        else if (this.sensorParamPanel.isShowing()) {
+        } else if (this.sensorParamPanel.isShowing()) {
             sensorParamPanel.setSensor(vehicleViewObject.getSensors());
             sensorParamPanel.setVisible(false);
             propertySplitPane.setLeftComponent(null);
             propertySplitPane.setDividerSize(0);
-        }
-        else {
+        } else {
             sensorParamPanel.setSensor(vehicleViewObject.getSensors());
             sensorParamPanel.setVisible(true);
             propertySplitPane.setLeftComponent(sensorParamPanel);
@@ -506,7 +514,7 @@ public class Visualizer3D extends JFrame {
         propertySplitPane.resetToPreferredSizes();
         revalidate();
     }
-    
+
     public void toggleReportPanel() {
         this.toggleReportPanel(!reportPanel.isShowing());
     }
@@ -1079,7 +1087,7 @@ public class Visualizer3D extends JFrame {
                 case KeyEvent.VK_D :
                     toggleSensorControlDialog();
                     break;
-    
+
                 // pause/start report updates
                 case KeyEvent.VK_T :
                     setReportPaused(!reportPaused);
@@ -1128,6 +1136,11 @@ public class Visualizer3D extends JFrame {
                     msgOutputStream.setNumOfMessages(50);
                     Simulator.printKeyCommands();
                     msgOutputStream.resetNumOfMessages();
+                    break;
+
+                // Pause simulation
+                case KeyEvent.VK_P :
+                    simulator.pauseToggle();
                     break;
 
                 // exit app

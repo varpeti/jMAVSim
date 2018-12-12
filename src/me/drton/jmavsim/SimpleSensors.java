@@ -55,10 +55,10 @@ public class SimpleSensors implements Sensors {
     }
 
     @Override
-    public void setObject(DynamicObject object) {
+    public void setObject(DynamicObject object, long t) {
         this.object = object;
         globalProjector.init(object.getWorld().getGlobalReference());
-        setGlobalPosition(null);
+        setGlobalPosition(null, t);
     }
 
     public void setGPSStartTime(long time) {
@@ -161,12 +161,11 @@ public class SimpleSensors implements Sensors {
         return globalPosition;
     }
 
-    public void setGlobalPosition(Vector3d pos) {
+    public void setGlobalPosition(Vector3d pos, long t) {
         if (pos == null) {
             pos = object.getPosition();
         }
 
-        long t = System.currentTimeMillis();
         double dt = 0.0;
         if (prevUpdateTime > 0) {
             dt = (t - this.prevUpdateTime) * 1e-3;
@@ -201,9 +200,13 @@ public class SimpleSensors implements Sensors {
     }
 
     @Override
-    public void update(long t) {
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
+        }
+
         float eph, epv;
-        setGlobalPosition(null);
+        setGlobalPosition(null, t);
 
         // GPS
         if (gpsStartTime > -1 && t > gpsStartTime && gpsNext <= t) {
@@ -218,57 +221,45 @@ public class SimpleSensors implements Sensors {
             gpsCurrent.epv = epv;
             gpsCurrent.velocity = new Vector3d(object.getVelocity());
             gpsCurrent.fix = eph <= fix3Deph ? 3 : eph <= fix2Deph ? 2 : 0;
-            gpsCurrent.time = System.currentTimeMillis() * 1000;
+            gpsCurrent.time = t * 1000;
             gps = gpsDelayLine.getOutput(t, gpsCurrent);
         }
     }
 
     @Override
     public void setParameter(String name, float value) {
-        if ( name.equals("noise_Acc") ) {
+        if (name.equals("noise_Acc")) {
             noise_Acc = value;
-        }
-        else if ( name.equals("noise_Gyo") ) {
+        } else if (name.equals("noise_Gyo")) {
             noise_Gyo = value;
-        }
-        else if ( name.equals("noise_Mag") ) {
+        } else if (name.equals("noise_Mag")) {
             noise_Mag = value;
-        }
-        else if ( name.equals("noise_Prs") ) {
+        } else if (name.equals("noise_Prs")) {
             noise_Prs = value;
-        }
-        else if ( name.equals("gpsNoiseStdDev") ) {
+        } else if (name.equals("gpsNoiseStdDev")) {
             gpsNoiseStdDev = value;
-        }
-        else if ( name.equals("mass")) {
+        } else if (name.equals("mass")) {
             object.setMass((double)value);
-        }
-        else {
+        } else {
             System.out.printf("ERROR: unknown param");
         }
     }
 
     @Override
     public float param(String name) {
-        if ( name.equals("noise_Acc") ) {
+        if (name.equals("noise_Acc")) {
             return noise_Acc;
-        }
-        else if ( name.equals("noise_Gyo") ) {
+        } else if (name.equals("noise_Gyo")) {
             return noise_Gyo;
-        }
-        else if ( name.equals("noise_Mag") ) {
+        } else if (name.equals("noise_Mag")) {
             return noise_Mag;
-        }
-        else if ( name.equals("noise_Prs") ) {
+        } else if (name.equals("noise_Prs")) {
             return noise_Prs;
-        }
-        else if ( name.equals("gpsNoiseStdDev") ) {
+        } else if (name.equals("gpsNoiseStdDev")) {
             return gpsNoiseStdDev;
-        }
-        else if ( name.equals("mass") ) {
+        } else if (name.equals("mass")) {
             return (float)object.getMass();
-        }
-        else {
+        } else {
             System.out.printf("ERROR: unknown param");
         }
 

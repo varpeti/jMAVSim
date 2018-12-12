@@ -12,7 +12,11 @@ public class Rotor {
     private long lastTime = -1;
     private double control = 0.0;
 
-    public void update(long t) {
+    public void update(long t, boolean paused) {
+        if (paused) {
+            return;
+        }
+
         if (lastTime >= 0) {
             double dt = (t - lastTime) / 1000.0;
             w += (control - w) * (1.0 - Math.exp(-dt / tau));
