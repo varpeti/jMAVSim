@@ -126,15 +126,15 @@ public class MAVLinkHILSystem extends MAVLinkSystem {
                     if (sysId < 0) {
                         sysId = msg.systemID;
                     }
+
+                    System.out.println("Init MAVLink");
+                    initMavLink();
+
                 } else if (sysId > -1 && sysId != msg.systemID) {
                     System.out.println("WARNING: Got heartbeat from system #" + Integer.toString(msg.systemID) +
                                        " but configured to only accept messages from system #" + Integer.toString(sysId) +
                                        ". Please change the system ID parameter to match in order to use HITL/SITL.");
                 }
-            }
-            if (gotHeartBeat) {
-                System.out.println("Init MAVLink");
-                initMavLink();
             }
             if ((msg.getInt("base_mode") & 128) == 0) {
                 vehicle.setControl(Collections.<Double>emptyList());
