@@ -41,14 +41,12 @@ else
 fi
 
 # Check that exactly one directory is given
-if [ $# -eq 0 ];
-then
+if [ $# -eq 0 ]; then
     echo "No directory supplied"
     echo "Usage: ./fix_style.sh dir"
     exit 1
 
-elif [ $# -gt 1 ];
-then
+elif [ $# -gt 1 ]; then
     echo "Too many directories supplied"
     echo "Usage: ./fix_style.sh dir"
     exit 1
