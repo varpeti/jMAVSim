@@ -121,7 +121,7 @@ public class Visualizer3D extends JFrame {
         int top = node.getInt("top", 0);
         size.width = node.getInt("width", size.width);
         size.height = node.getInt("height", size.height);
-        addWindowListener( new WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             private void saveState() {
                 // save window location
                 node.putInt("left", getX());
@@ -225,7 +225,8 @@ public class Visualizer3D extends JFrame {
 
     public Rectangle getWindowBoundsAllScreens() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        Rectangle virtualBounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        Rectangle virtualBounds =
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         GraphicsDevice[] gs = ge.getScreenDevices();
         for (int j = 0; j < gs.length; j++) {
             GraphicsDevice gd = gs[j];
