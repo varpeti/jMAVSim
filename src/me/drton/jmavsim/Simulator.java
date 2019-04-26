@@ -777,7 +777,7 @@ public class Simulator implements Runnable {
                         // try to parse passed-in ports.
                         String[] list = nextArg.split(":");
                         if (list.length != 2) {
-                            System.err.println("Expected: " + QGC_STRING + ", got: " + Arrays.toString(list));
+                            System.err.println("Expected: " + SDK_STRING + ", got: " + Arrays.toString(list));
                             return;
                         }
                         sdkIpAddress = list[0];
