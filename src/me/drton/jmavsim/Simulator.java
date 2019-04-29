@@ -40,6 +40,7 @@ public class Simulator implements Runnable {
     private static Port PORT = Port.UDP;
 
     public static boolean   COMMUNICATE_WITH_QGC  = true;   // open UDP port to QGC
+    public static boolean   COMMUNICATE_WITH_SDK  = true;   // open UDP port to SDK
     public static boolean   DO_MAG_FIELD_LOOKUP   =
         false;  // perform online mag incl/decl lookup for current position
     public static boolean   USE_GIMBAL            =
@@ -61,6 +62,7 @@ public class Simulator implements Runnable {
     public static final String DEFAULT_AUTOPILOT_TYPE = "generic";  // eg. "px4" or "aq"
     public static final int    DEFAULT_AUTOPILOT_PORT = 14560;
     public static final int    DEFAULT_QGC_PEER_PORT = 14550;
+    public static final int    DEFAULT_SDK_PEER_PORT = 14540;
     public static final String DEFAULT_SERIAL_PATH = "/dev/tty.usbmodem1";
     public static final int    DEFAULT_SERIAL_BAUD_RATE = 230400;
     public static final String LOCAL_HOST = "127.0.0.1";
@@ -106,7 +108,9 @@ public class Simulator implements Runnable {
     private static String autopilotIpAddress = LOCAL_HOST;
     private static int autopilotPort = DEFAULT_AUTOPILOT_PORT;
     private static String qgcIpAddress = LOCAL_HOST;
+    private static String sdkIpAddress = LOCAL_HOST;
     private static int qgcPeerPort = DEFAULT_QGC_PEER_PORT;
+    private static int sdkPeerPort = DEFAULT_SDK_PEER_PORT;
     private static String serialPath = DEFAULT_SERIAL_PATH;
     private static int serialBaudRate = DEFAULT_SERIAL_BAUD_RATE;
 
@@ -120,6 +124,7 @@ public class Simulator implements Runnable {
     private MAVLinkHILSystem hilSystem;
     private MAVLinkPort autopilotMavLinkPort;
     private UDPMavLinkPort udpGCMavLinkPort;
+    private UDPMavLinkPort udpSDKMavLinkPort;
     private ScheduledFuture<?> thisHandle;
     private World world;
     private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -228,6 +233,7 @@ public class Simulator implements Runnable {
         // allow HIL and GCS to talk to this port
         connHIL.addNode(autopilotMavLinkPort);
         connCommon.addNode(autopilotMavLinkPort);
+
         // UDP port: connection to ground station
         udpGCMavLinkPort = new UDPMavLinkPort(schema);
         udpGCMavLinkPort.setDebug(DEBUG_MODE);
@@ -238,6 +244,18 @@ public class Simulator implements Runnable {
                 udpGCMavLinkPort.setMonitorMessageID(monitorMessageIds);
             }
             connCommon.addNode(udpGCMavLinkPort);
+        }
+
+        // UDP port: connection to SDK or MAVROS
+        udpSDKMavLinkPort = new UDPMavLinkPort(schema);
+        udpSDKMavLinkPort.setDebug(DEBUG_MODE);
+        if (COMMUNICATE_WITH_SDK) {
+            udpSDKMavLinkPort.setup(sdkIpAddress, sdkPeerPort);
+            udpSDKMavLinkPort.setDebug(DEBUG_MODE);
+            if (monitorMessage && PORT == Port.SERIAL) {
+                udpSDKMavLinkPort.setMonitorMessageID(monitorMessageIds);
+            }
+            connCommon.addNode(udpSDKMavLinkPort);
         }
 
         // Set up magnetic field deviations
@@ -307,6 +325,14 @@ public class Simulator implements Runnable {
                 udpGCMavLinkPort.open();
             } catch (IOException e) {
                 System.out.println("ERROR: Failed to open UDP link to QGC: " + e.getLocalizedMessage());
+            }
+        }
+
+        if (COMMUNICATE_WITH_SDK) {
+            try {
+                udpSDKMavLinkPort.open();
+            } catch (IOException e) {
+                System.out.println("ERROR: Failed to open UDP link to SDK: " + e.getLocalizedMessage());
             }
         }
 
@@ -553,6 +579,7 @@ public class Simulator implements Runnable {
     public final static String UDP_STRING = "-udp <mav ip>:<mav port>";
     public final static String TCP_STRING = "-tcp <mav ip>:<mav port>";
     public final static String QGC_STRING = "-qgc <qgc ip address>:<qgc peer port>";
+    public final static String SDK_STRING = "-sdk <sdk ip address>:<sdk peer port>";
     public final static String SERIAL_STRING = "-serial [<path> <baudRate>]";
     public final static String MAG_STRING = "-automag";
     public final static String REP_STRING = "-rep";
@@ -575,6 +602,7 @@ public class Simulator implements Runnable {
                                               AP_STRING + "] [" +
                                               MAG_STRING + "] " + "[" +
                                               QGC_STRING + "] [" +
+                                              SDK_STRING + "] [" +
                                               GIMBAL_STRING + "] [" +
                                               GUI_AA_STRING + "] [" +
                                               GUI_MAX_STRING + "] [" +
@@ -732,6 +760,36 @@ public class Simulator implements Runnable {
                     System.err.println("-qgc needs an argument: " + QGC_STRING);
                     return;
                 }
+            } else if (arg.equals("-sdk")) {
+                COMMUNICATE_WITH_SDK = true;
+                if (i == args.length) {
+                    // only arg is -sdk, so use default values.
+                    break;
+                }
+                if (i < args.length) {
+                    String nextArg = args[i++];
+                    if (nextArg.startsWith("-")) {
+                        // only turning on udp, but want to use default ports
+                        i--;
+                        continue;
+                    }
+                    try {
+                        // try to parse passed-in ports.
+                        String[] list = nextArg.split(":");
+                        if (list.length != 2) {
+                            System.err.println("Expected: " + SDK_STRING + ", got: " + Arrays.toString(list));
+                            return;
+                        }
+                        sdkIpAddress = list[0];
+                        sdkPeerPort = Integer.parseInt(list[1]);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Expected: " + SDK_STRING + ", got: " + e.toString());
+                        return;
+                    }
+                } else {
+                    System.err.println("-sdk needs an argument: " + SDK_STRING);
+                    return;
+                }
             } else if (arg.equals("-ap")) {
                 if (i < args.length) {
                     autopilotType = args[i++];
@@ -854,6 +912,9 @@ public class Simulator implements Runnable {
         System.out.println(QGC_STRING);
         System.out.println("      Forward message packets to QGC via UDP at " + qgcIpAddress + ":" +
                            qgcPeerPort + "");
+        System.out.println(SDK_STRING);
+        System.out.println("      Forward message packets to SDK via UDP at " + sdkIpAddress + ":" +
+                           sdkPeerPort + "");
         System.out.println(GIMBAL_STRING);
         System.out.println("      Enable/Disable the gimbal model. Default is '" + USE_GIMBAL + "'.");
         System.out.println(GUI_AA_STRING);
