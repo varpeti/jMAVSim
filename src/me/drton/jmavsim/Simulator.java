@@ -164,6 +164,12 @@ public class Simulator implements Runnable {
         LatLonAlt referencePos = new LatLonAlt(latRef, lonRef, altRef);
         world.setGlobalReference(referencePos);
 
+        // Get SITL speed from environment as well.
+        String speedFactorStr = System.getenv("PX4_SIM_SPEED_FACTOR");
+        if (speedFactorStr != null) {
+            speedFactor = Double.parseDouble(speedFactorStr);
+        }
+
         // Create environment
         SimpleEnvironment simpleEnvironment = new SimpleEnvironment(world);
         //simpleEnvironment.setWind(new Vector3d(0.8, 2.0, 0.0));
@@ -611,7 +617,6 @@ public class Simulator implements Runnable {
                                               UDP_STRING + " | " +
                                               SERIAL_STRING + "] [" +
                                               RATE_STRING + "] [" +
-                                              SPEED_FACTOR_STRING + "] [" +
                                               AP_STRING + "] [" +
                                               MAG_STRING + "] " + "[" +
                                               QGC_STRING + "] [" +
@@ -834,6 +839,8 @@ public class Simulator implements Runnable {
                         return;
                     }
                     speedFactor = f;
+                    System.out.println("Warning: Setting speed factor using -f is deprecated.");
+                    System.out.println("Please use the environment variable PX4_SIM_SPEED_FACTOR instead.");
                 } else {
                     System.err.println("-r requires Hz as an argument.");
                     return;
