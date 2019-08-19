@@ -1,7 +1,6 @@
-
-# use travis-ci docker based infrastructure
 sudo: false
 
+dist: trusty
 language: java
 
 jdk:
