@@ -305,31 +305,31 @@ public class Simulator implements Runnable {
             simpleEnvironment.setMagField(magField);
         }
 
-        // Create vehicle with sensors
-        if (autopilotType == "aq") {
-            vehicle = buildAQ_leora();
-        } else {
-            vehicle = buildMulticopter();
-        }
-
-        // Create MAVLink HIL system
-        // SysId should be the same as autopilot, ComponentId should be different!
-        if (DISPLAY_ONLY){
-            vehicle.setIgnoreGravity(true);
-            vehicle.setIgnoreWind(true);
-            hilSystem = new MAVLinkDisplayOnly(schema, autopilotSysId, 51, vehicle);
-        } else {
-            hilSystem = new MAVLinkHILSystem(schema, autopilotSysId, 51, vehicle);
-            if (SHOW_GUI) {
-                visualizer.setHilSystem((MAVLinkHILSystem)hilSystem);
-            }
-        }
-        hilSystem.setSimulator(this);
-        //hilSystem.setHeartbeatInterval(0);
-        connHIL.addNode(hilSystem);
-        world.addObject(vehicle);
-
         if (SHOW_GUI) {
+            // Create vehicle with sensors
+            if (autopilotType == "aq") {
+                vehicle = buildAQ_leora();
+            } else {
+                vehicle = buildMulticopter();
+            }
+
+            // Create MAVLink HIL system
+            // SysId should be the same as autopilot, ComponentId should be different!
+            if (DISPLAY_ONLY){
+                vehicle.setIgnoreGravity(true);
+                vehicle.setIgnoreWind(true);
+                hilSystem = new MAVLinkDisplayOnly(schema, autopilotSysId, 51, vehicle);
+            } else {
+                hilSystem = new MAVLinkHILSystem(schema, autopilotSysId, 51, vehicle);
+                if (SHOW_GUI) {
+                    visualizer.setHilSystem((MAVLinkHILSystem)hilSystem);
+                }
+            }
+            hilSystem.setSimulator(this);
+            //hilSystem.setHeartbeatInterval(0);
+            connHIL.addNode(hilSystem);
+            world.addObject(vehicle);
+
             // Put camera on vehicle with gimbal
             if (USE_GIMBAL) {
                 gimbal = buildGimbal();
