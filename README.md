@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/PX4/jMAVSim.svg?branch=master)](https://travis-ci.org/PX4/jMAVSim)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DrTon/jMAVSim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Simple multirotor simulator with MAVLink protocol support
 
@@ -8,7 +7,7 @@ Simple multirotor simulator with MAVLink protocol support
 ### Installation ###
 
 Requirements:
- * Java 7 or newer (JDK, http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+ * Java 8 or newer (JDK, http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
  * Java3D and JOGL/JOAL jars, including native libs for Linux (i586/64bit), Windows (i586/64bit) and Mac OS (universal) already included in this repository, no need to install it.
 
@@ -84,6 +83,7 @@ Actions:
 -   T   - Toggle data report updates.
 -   D   - Toggle sensor parameter control sidebar.
 -   F1  - Show this key commands reference.
+-   P   - Pause.
 -  ESC  - Exit jMAVSim.
 - SPACE - Reset vehicle & view to start position.
 
