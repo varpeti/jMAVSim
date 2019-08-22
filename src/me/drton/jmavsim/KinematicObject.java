@@ -39,13 +39,13 @@ public abstract class KinematicObject extends WorldObject {
     public KinematicObject(World world) {
         super(world);
         rotation.setIdentity();
-        transformGroup = new TransformGroup();
-        transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-        transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        transform = new Transform3D();
-        transformGroup.setTransform(transform);
-        branchGroup = new BranchGroup();
-        branchGroup.addChild(transformGroup);
+        // transformGroup = new TransformGroup();
+        // transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+        // transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        // transform = new Transform3D();
+        // transformGroup.setTransform(transform);
+        // branchGroup = new BranchGroup();
+        // branchGroup.addChild(transformGroup);
     }
 
     /**

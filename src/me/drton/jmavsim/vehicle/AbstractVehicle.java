@@ -24,7 +24,7 @@ public abstract class AbstractVehicle extends DynamicObject implements Reporting
 
     public AbstractVehicle(World world, String modelName) {
         super(world);
-        modelFromFile(modelName);
+        // modelFromFile(modelName);
         resetObjectParameters();
     }
 
