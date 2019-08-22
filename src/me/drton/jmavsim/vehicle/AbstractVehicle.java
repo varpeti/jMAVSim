@@ -22,9 +22,9 @@ public abstract class AbstractVehicle extends DynamicObject implements Reporting
     protected List<Double> control = Collections.emptyList();
     protected Sensors sensors = null;
 
-    public AbstractVehicle(World world, String modelName, boolean gui) {
-        super(world, gui);
-        if (gui) {
+    public AbstractVehicle(World world, String modelName, boolean showGui) {
+        super(world, showGui);
+        if (showGui) {
             modelFromFile(modelName);
         }
         resetObjectParameters();

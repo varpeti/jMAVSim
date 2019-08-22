@@ -36,10 +36,10 @@ public abstract class KinematicObject extends WorldObject {
     protected TransformGroup transformGroup;
     protected BranchGroup branchGroup;
 
-    public KinematicObject(World world, boolean gui) {
+    public KinematicObject(World world, boolean showGui) {
         super(world);
         rotation.setIdentity();
-        if (gui) {
+        if (showGui) {
             transformGroup = new TransformGroup();
             transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
             transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
