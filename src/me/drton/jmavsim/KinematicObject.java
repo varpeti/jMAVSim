@@ -36,16 +36,18 @@ public abstract class KinematicObject extends WorldObject {
     protected TransformGroup transformGroup;
     protected BranchGroup branchGroup;
 
-    public KinematicObject(World world) {
+    public KinematicObject(World world, boolean showGui) {
         super(world);
         rotation.setIdentity();
-        transformGroup = new TransformGroup();
-        transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-        transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        transform = new Transform3D();
-        transformGroup.setTransform(transform);
-        branchGroup = new BranchGroup();
-        branchGroup.addChild(transformGroup);
+        if (showGui) {
+            transformGroup = new TransformGroup();
+            transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+            transformGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+            transform = new Transform3D();
+            transformGroup.setTransform(transform);
+            branchGroup = new BranchGroup();
+            branchGroup.addChild(transformGroup);
+        }
     }
 
     /**

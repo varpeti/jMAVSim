@@ -13,8 +13,8 @@ import java.io.FileNotFoundException;
 public abstract class Target extends KinematicObject {
     private GlobalPositionProjector gpsProjector = new GlobalPositionProjector();
 
-    public Target(World world, double size) throws FileNotFoundException {
-        super(world);
+    public Target(World world, double size, boolean showGui) throws FileNotFoundException {
+        super(world, showGui);
         Sphere sphere = new Sphere((float) size);
         transformGroup.addChild(sphere);
         gpsProjector.init(world.getGlobalReference());

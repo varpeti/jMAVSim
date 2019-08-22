@@ -20,8 +20,8 @@ public abstract class DynamicObject extends KinematicObject {
     private Matrix3d rotMtx = new Matrix3d();
     private AxisAngle4d rotAng = new AxisAngle4d();
 
-    public DynamicObject(World world) {
-        super(world);
+    public DynamicObject(World world, boolean showGui) {
+        super(world, showGui);
         rotation.rotX(0);
         momentOfInertia.rotZ(0.0);
         momentOfInertiaInv.rotZ(0.0);

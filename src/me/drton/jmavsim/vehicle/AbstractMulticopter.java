@@ -15,8 +15,8 @@ public abstract class AbstractMulticopter extends AbstractVehicle {
     private double dragRotate = 0.0;
     protected Rotor[] rotors;
 
-    public AbstractMulticopter(World world, String modelName) {
-        super(world, modelName);
+    public AbstractMulticopter(World world, String modelName, boolean showGui) {
+        super(world, modelName, showGui);
         rotors = new Rotor[getRotorsNum()];
         for (int i = 0; i < getRotorsNum(); i++) {
             rotors[i] = new Rotor();

@@ -45,6 +45,7 @@ public class Simulator implements Runnable {
         false;  // perform online mag incl/decl lookup for current position
     public static boolean   USE_GIMBAL            =
         true;   // enable gimbal modeling (optionally also define remote pitch/roll controls below)
+    public static boolean   SHOW_GUI              = true;   // Default is to have the GUI
     public static boolean   GUI_SHOW_REPORT_PANEL = false;  // start with report panel showing
     public static boolean   GUI_START_MAXIMIZED   = false;  // start with gui in maximized window
     public static boolean   GUI_ENABLE_AA         = true;   // anti-alias on 3D scene
@@ -178,17 +179,23 @@ public class Simulator implements Runnable {
         //simpleEnvironment.setGroundLevel(0.0f);
         world.addObject(simpleEnvironment);
 
-        // Create GUI
-        System.out.println("Starting GUI...");  // this is the longest part of startup so let user know
-        visualizer = new Visualizer3D(world);
-        visualizer.setSimulator(this);
-        visualizer.setAAEnabled(GUI_ENABLE_AA);
-        if (GUI_START_MAXIMIZED) {
-            visualizer.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
+        if (SHOW_GUI) {
+            // Create GUI
+            System.out.println("Starting GUI...");  // this is the longest part of startup so let user know
+            visualizer = new Visualizer3D(world);
+            visualizer.setSimulator(this);
+            visualizer.setAAEnabled(GUI_ENABLE_AA);
+            if (GUI_START_MAXIMIZED) {
+                visualizer.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            }
 
-        // add GUI output stream handler for displaying messages
-        outputHandler.addOutputStream(visualizer.getOutputStream());
+            // add GUI output stream handler for displaying messages
+            outputHandler.addOutputStream(visualizer.getOutputStream());
+        } else {
+            // GUI is disabled
+            System.out.println("GUI not enabled");
+            visualizer = null;
+        }
 
         MAVLinkSchema schema = null;
         try {
@@ -313,30 +320,34 @@ public class Simulator implements Runnable {
             hilSystem = new MAVLinkDisplayOnly(schema, autopilotSysId, 51, vehicle);
         } else {
             hilSystem = new MAVLinkHILSystem(schema, autopilotSysId, 51, vehicle);
-            visualizer.setHilSystem((MAVLinkHILSystem)hilSystem);
+            if (SHOW_GUI) {
+                visualizer.setHilSystem((MAVLinkHILSystem)hilSystem);
+            }
         }
         hilSystem.setSimulator(this);
         //hilSystem.setHeartbeatInterval(0);
         connHIL.addNode(hilSystem);
         world.addObject(vehicle);
 
-        // Put camera on vehicle with gimbal
-        if (USE_GIMBAL) {
-            gimbal = buildGimbal();
-            world.addObject(gimbal);
-            visualizer.setGimbalViewObject(gimbal);
+        if (SHOW_GUI) {
+            // Put camera on vehicle with gimbal
+            if (USE_GIMBAL) {
+                gimbal = buildGimbal();
+                world.addObject(gimbal);
+                visualizer.setGimbalViewObject(gimbal);
+            }
+
+            // Create simulation report updater
+            world.addObject(new ReportUpdater(world, visualizer));
+
+            visualizer.addWorldModels();
+            visualizer.setVehicleViewObject(vehicle);
+
+            // set default view and zoom mode
+            visualizer.setViewType(GUI_START_VIEW);
+            visualizer.setZoomMode(GUI_START_ZOOM);
+            visualizer.toggleReportPanel(GUI_SHOW_REPORT_PANEL);
         }
-
-        // Create simulation report updater
-        world.addObject(new ReportUpdater(world, visualizer));
-
-        visualizer.addWorldModels();
-        visualizer.setVehicleViewObject(vehicle);
-
-        // set default view and zoom mode
-        visualizer.setViewType(GUI_START_VIEW);
-        visualizer.setZoomMode(GUI_START_ZOOM);
-        visualizer.toggleReportPanel(GUI_SHOW_REPORT_PANEL);
 
         // Open ports
         try {
@@ -418,7 +429,7 @@ public class Simulator implements Runnable {
     private AbstractMulticopter buildMulticopter() {
         Vector3d gc = new Vector3d(0.0, 0.0, 0.0);  // gravity center
         AbstractMulticopter vehicle = new Quadcopter(world, DEFAULT_VEHICLE_MODEL, "x", "default",
-                                                     0.33 / 2, 4.0, 0.05, 0.005, gc);
+                                                     0.33 / 2, 4.0, 0.05, 0.005, gc, SHOW_GUI);
         Matrix3d I = new Matrix3d();
         // Moments of inertia
         I.m00 = 0.005;  // X
@@ -444,7 +455,7 @@ public class Simulator implements Runnable {
     private AbstractMulticopter buildAQ_leora() {
         Vector3d gc = new Vector3d(0.0, 0.0, 0.0);  // gravity center
         AbstractMulticopter vehicle = new Quadcopter(world, DEFAULT_VEHICLE_MODEL, "x", "cw_fr", 0.1, 1.35,
-                                                     0.02, 0.0005, gc);
+                                                     0.02, 0.0005, gc, SHOW_GUI);
 
         Matrix3d I = new Matrix3d();
         // Moments of inertia
@@ -472,7 +483,7 @@ public class Simulator implements Runnable {
     }
 
     private CameraGimbal2D buildGimbal() {
-        CameraGimbal2D g = new CameraGimbal2D(world, DEFAULT_GIMBAL_MODEL);
+        CameraGimbal2D g = new CameraGimbal2D(world, DEFAULT_GIMBAL_MODEL, SHOW_GUI);
         g.setBaseObject(vehicle);
         g.setPitchChannel(DEFAULT_CAM_PITCH_CHAN);
         g.setPitchScale(DEFAULT_CAM_PITCH_SCAL);
@@ -609,6 +620,7 @@ public class Simulator implements Runnable {
     public final static String SERIAL_STRING = "-serial [<path> <baudRate>]";
     public final static String MAG_STRING = "-automag";
     public final static String REP_STRING = "-rep";
+    public final static String SHOW_GUI_STRING = "[-no]-gui";
     public final static String GUI_AA_STRING = "[-no]-aa";
     public final static String GIMBAL_STRING = "[-no]-gimbal";
     public final static String GUI_MAX_STRING = "-max";
@@ -617,7 +629,7 @@ public class Simulator implements Runnable {
     public final static String RATE_STRING = "-r <Hz>";
     public final static String SPEED_FACTOR_STRING = "-f";
     public final static String LOCKSTEP_STRING = "-lockstep";
-    public final static String DISPLAY_ONLY_STRING = "-disponly";    
+    public final static String DISPLAY_ONLY_STRING = "-disponly";
     public final static String CMD_STRING =
         "java [-Xmx512m] -cp lib/*:out/production/jmavsim.jar me.drton.jmavsim.Simulator";
     public final static String CMD_STRING_JAR = "java [-Xmx512m] -jar jmavsim_run.jar";
@@ -630,6 +642,7 @@ public class Simulator implements Runnable {
                                               QGC_STRING + "] [" +
                                               SDK_STRING + "] [" +
                                               GIMBAL_STRING + "] [" +
+                                              SHOW_GUI_STRING + "] [" +
                                               GUI_AA_STRING + "] [" +
                                               GUI_MAX_STRING + "] [" +
                                               GUI_VIEW_STRING + "] [" +
@@ -887,6 +900,10 @@ public class Simulator implements Runnable {
                 USE_GIMBAL = true;
             } else if (arg.equals("-no-gimbal")) {
                 USE_GIMBAL = false;
+            } else if (arg.equals("-gui")) {
+                SHOW_GUI = true;
+            } else if (arg.equals("-no-gui")) {
+                SHOW_GUI = false;
             } else if (arg.equals("-lockstep")) {
                 LOCKSTEP_ENABLED = true;
             } else if (arg.equals("-debug")) {
@@ -948,6 +965,9 @@ public class Simulator implements Runnable {
                            sdkPeerPort + "");
         System.out.println(GIMBAL_STRING);
         System.out.println("      Enable/Disable the gimbal model. Default is '" + USE_GIMBAL + "'.");
+        System.out.println(SHOW_GUI_STRING);
+        System.out.println("      Enable/Disable the GUI. Default is '" + SHOW_GUI +
+                           "'.");
         System.out.println(GUI_AA_STRING);
         System.out.println("      Enable/Disable anti-aliasing on 3D scene. Default is '" + GUI_ENABLE_AA +
                            "'.");
@@ -961,7 +981,7 @@ public class Simulator implements Runnable {
         System.out.println(PRINT_INDICATION_STRING);
         System.out.println("      Monitor (echo) all/selected MAVLink messages to the console.");
         System.out.println("      If no MsgIDs are specified, all messages are monitored.");
-        System.out.println(DISPLAY_ONLY_STRING);        
+        System.out.println(DISPLAY_ONLY_STRING);
         System.out.println("      Disable the simulation engine.");
         System.out.println("      Display the autopilot states from HIL_STATE_QUATERNION.");
         System.out.println("      Compatible with simulation-in-hardware.");

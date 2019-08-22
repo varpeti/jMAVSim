@@ -24,11 +24,12 @@ public class Hexacopter extends AbstractMulticopter {
      * @param rotorTorque    torque at full thrust of one rotor
      * @param rotorTimeConst spin-up time of rotor
      * @param rotorsOffset   rotors positions offset from gravity center
+     * @param showGui        false if the GUI has been disabled
      */
     public Hexacopter(World world, String modelName, String orientation, double armLength,
-                      double rotorThrust,
-                      double rotorTorque, double rotorTimeConst, Vector3d rotorsOffset) {
-        super(world, modelName);
+                      double rotorThrust, double rotorTorque, double rotorTimeConst,
+                      Vector3d rotorsOffset, boolean showGui) {
+        super(world, modelName, showGui);
         rotorPositions[0] = new Vector3d(armLength, 0.0, 0.0);
         rotorPositions[1] = new Vector3d(-armLength, 0.0, 0.0);
         rotorPositions[2] = new Vector3d(-armLength * Math.cos(Math.PI / 3),

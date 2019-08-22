@@ -34,8 +34,8 @@ public class CameraGimbal2D extends KinematicObject implements ReportingObject {
     private TransformGroup gimbalTG;
     private Matrix3d rotM3d = new Matrix3d(); // temp storage
 
-    public CameraGimbal2D(World world, String modelName) {
-        super(world);
+    public CameraGimbal2D(World world, String modelName, boolean showGui) {
+        super(world, showGui);
         if (!modelName.isEmpty()) {
 
             Texture texture = new TextureLoader(modelName, null).getTexture();
