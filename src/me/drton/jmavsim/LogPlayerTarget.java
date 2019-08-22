@@ -28,8 +28,8 @@ public class LogPlayerTarget extends Target {
     private Vector3d postitionPrev = new Vector3d();
     private long timePrev = 0;
 
-    public LogPlayerTarget(World world, double size) throws FileNotFoundException {
-        super(world, size);
+    public LogPlayerTarget(World world, double size, boolean gui) throws FileNotFoundException {
+        super(world, size, gui);
     }
 
     public void openLog(LogReader logReader) {

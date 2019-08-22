@@ -429,7 +429,7 @@ public class Simulator implements Runnable {
     private AbstractMulticopter buildMulticopter() {
         Vector3d gc = new Vector3d(0.0, 0.0, 0.0);  // gravity center
         AbstractMulticopter vehicle = new Quadcopter(world, DEFAULT_VEHICLE_MODEL, "x", "default",
-                                                     0.33 / 2, 4.0, 0.05, 0.005, gc);
+                                                     0.33 / 2, 4.0, 0.05, 0.005, gc, SHOW_GUI);
         Matrix3d I = new Matrix3d();
         // Moments of inertia
         I.m00 = 0.005;  // X
@@ -455,7 +455,7 @@ public class Simulator implements Runnable {
     private AbstractMulticopter buildAQ_leora() {
         Vector3d gc = new Vector3d(0.0, 0.0, 0.0);  // gravity center
         AbstractMulticopter vehicle = new Quadcopter(world, DEFAULT_VEHICLE_MODEL, "x", "cw_fr", 0.1, 1.35,
-                                                     0.02, 0.0005, gc);
+                                                     0.02, 0.0005, gc, SHOW_GUI);
 
         Matrix3d I = new Matrix3d();
         // Moments of inertia
@@ -483,7 +483,7 @@ public class Simulator implements Runnable {
     }
 
     private CameraGimbal2D buildGimbal() {
-        CameraGimbal2D g = new CameraGimbal2D(world, DEFAULT_GIMBAL_MODEL);
+        CameraGimbal2D g = new CameraGimbal2D(world, DEFAULT_GIMBAL_MODEL, SHOW_GUI);
         g.setBaseObject(vehicle);
         g.setPitchChannel(DEFAULT_CAM_PITCH_CHAN);
         g.setPitchScale(DEFAULT_CAM_PITCH_SCAL);
