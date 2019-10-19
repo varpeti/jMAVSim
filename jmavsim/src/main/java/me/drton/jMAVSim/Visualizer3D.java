@@ -1,9 +1,6 @@
 package me.drton.jmavsim;
 
-//import com.sun.j3d.utils.geometry.Box;
-//import com.sun.j3d.utils.geometry.Cylinder;
 import com.sun.j3d.utils.geometry.Sphere;
-import com.sun.j3d.utils.image.ImageException;
 import com.sun.j3d.utils.image.TextureLoader;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 import me.drton.jmavsim.vehicle.AbstractVehicle;
@@ -409,7 +406,7 @@ public class Visualizer3D extends JFrame {
             texLoader = new TextureLoader(fn, null);
             // enable Mipmapping (increases memory usage considerably)
             //texLoader = new TextureLoader(fn, TextureLoader.GENERATE_MIPMAP, null);
-        }  catch (ImageException e) {
+        } catch (Exception e) {
             System.out.println("Error, could not load texture: " + fn);
             System.out.println("Error message:" + e.getLocalizedMessage());
         }

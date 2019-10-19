@@ -8,28 +8,23 @@ Simple multirotor simulator with MAVLink protocol support
 
 Requirements:
  * Java 8 or newer (JDK, http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-
- * Java3D and JOGL/JOAL jars, including native libs for Linux (i586/64bit), Windows (i586/64bit) and Mac OS (universal) already included in this repository, no need to install it.
-
- * libvecmath-java (for ubuntu)
+ * Maven
 
 Clone repository and initialize submodules:
 ```
-git clone https://github.com/PX4/jMAVSim.git
-git submodule init
-git submodule update
+git clone --recursive https://github.com/PX4/jMAVSim.git
 ```
 
 Install prerequisites via HomeBrew:
 
 ```
-brew install ant
+brew install mvn
 ```
 
 Create a standalone runnable JAR file with all libraries included, copy supporting resources, and use a shorter command to execute:
 
 ```
-ant create_run_jar copy_res
+mvn package
 cd out/production
 java -Djava.ext.dirs= -jar jmavsim_run.jar [any jMAVSim options]
 ```

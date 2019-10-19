@@ -2,3 +2,6 @@
 	path = jMAVlib
 	url = https://github.com/PX4/jMAVlib.git
 	branch = master
+[submodule "jmavlib"]
+	path = jmavlib
+	url = git@github.com:PX4/jmavlib.git
