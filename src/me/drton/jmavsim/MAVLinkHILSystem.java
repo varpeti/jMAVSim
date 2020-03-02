@@ -182,24 +182,34 @@ public class MAVLinkHILSystem extends MAVLinkHILSystemBase {
         // Sensors
         MAVLinkMessage msg_sensor = new MAVLinkMessage(schema, "HIL_SENSOR", sysId, componentId,
                                                        protocolVersion);
+
+        // sensor source bitmask
+        int sensor_source = 0;
+
         msg_sensor.set("time_usec", tu);
         Vector3d tv = sensors.getAcc();
         msg_sensor.set("xacc", tv.x);
         msg_sensor.set("yacc", tv.y);
         msg_sensor.set("zacc", tv.z);
         tv = sensors.getGyro();
+        sensor_source |= 0b111;
         msg_sensor.set("xgyro", tv.x);
         msg_sensor.set("ygyro", tv.y);
         msg_sensor.set("zgyro", tv.z);
         tv = sensors.getMag();
+        sensor_source |= 0b111000;
         msg_sensor.set("xmag", tv.x);
         msg_sensor.set("ymag", tv.y);
         msg_sensor.set("zmag", tv.z);
+        sensor_source |= 0b111000000;
         msg_sensor.set("pressure_alt", sensors.getPressureAlt());
         msg_sensor.set("abs_pressure", sensors.getPressure() * 0.01);  // Pa to millibar
+        sensor_source |= 0b1101000000000;
         if (sensors.isReset()) {
             msg_sensor.set("fields_updated", (1 << 31));
             sensors.setReset(false);
+        } else {
+            msg_sensor.set("fields_updated", sensor_source);
         }
         sendMessage(msg_sensor);
 
