@@ -16,6 +16,7 @@ Requirements:
 Clone repository and initialize submodules:
 ```
 git clone https://github.com/PX4/jMAVSim.git
+cd ~/jMAVSIM
 git submodule init
 git submodule update
 ```
