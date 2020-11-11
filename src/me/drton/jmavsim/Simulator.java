@@ -6,7 +6,9 @@ import me.drton.jmavsim.Visualizer3D.ViewTypes;
 import me.drton.jmavsim.Visualizer3D.ZoomModes;
 import me.drton.jmavsim.vehicle.AbstractMulticopter;
 import me.drton.jmavsim.vehicle.Quadcopter;
+import ml.varpeti.jmavsim.obstacles.Cube;
 
+import ml.varpeti.jmavsim.obstacles.Obstacles;
 import org.xml.sax.SAXException;
 
 import javax.swing.JFrame;
@@ -338,6 +340,9 @@ public class Simulator implements Runnable {
         connHIL.addNode(hilSystem);
         world.addObject(vehicle);
 
+        //Create Obstacles
+        Obstacles.newObstacles(world,SHOW_GUI,vehicle,new Vector3d(0.1,0.1,0.05));
+
         if (SHOW_GUI) {
             // Put camera on vehicle with gimbal
             if (USE_GIMBAL) {
@@ -357,6 +362,7 @@ public class Simulator implements Runnable {
             visualizer.setZoomMode(GUI_START_ZOOM);
             visualizer.toggleReportPanel(GUI_SHOW_REPORT_PANEL);
         }
+
 
         // Open ports
         try {
