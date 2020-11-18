@@ -12,10 +12,11 @@ public class V3DOctree extends Octree<objectType> {
 
     @Override
     protected void drawThis() {
-        if (this.value == objectType.Obstacle)
+        if (this.value == objectType.Obstacle) {
             synchronized (Obstacles.world) {
-                Obstacles.world.addObject(new Cube(this.pos, this.size.x, this.pos.toString()+" "+this.size.x ));
+                Obstacles.world.addObject(new Cube(this.pos, this.size.x, this.pos.toString() + " " + this.size.x));
             }
+        }
     }
 
     /*    4------5
@@ -55,6 +56,20 @@ public class V3DOctree extends Octree<objectType> {
         else for (int i = 0; i < numberOfChildren; i++) { ret.append(children[i].toString());}
 
         return ret.toString();
+    }
+
+    public int numOf(objectType type)
+    {
+        int ret = 0;
+        if (this.leaf) {
+            if (this.value == type)
+                return 1;
+            else
+                return 0;
+        }
+        else for (int i = 0; i < numberOfChildren; i++) { ret += ((V3DOctree)children[i]).numOf(type);}
+
+        return ret;
     }
 
 }

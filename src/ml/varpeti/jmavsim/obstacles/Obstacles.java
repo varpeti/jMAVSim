@@ -41,9 +41,7 @@ public final class Obstacles {
             Scanner myReader = new Scanner(new File(map));
 
             while (myReader.hasNextLine()) {
-                Vector3d a = mine(myReader.nextLine());
-                //synchronized (Obstacles.world) {world.addObject(new Cube(a, a.toString()));}
-                Obstacles.myOctree.setValue(a,new Vector3d(0.125,0.125,0.125), objectType.Obstacle);
+                mine(myReader.nextLine());
             }
             myReader.close();
         } catch (FileNotFoundException e) {
@@ -54,14 +52,18 @@ public final class Obstacles {
         }
 
         Obstacles.myOctree.draw();
-        System.out.println(Obstacles.myOctree);
+        System.out.println("Number of cubes: "+Obstacles.myOctree.numOf(objectType.Obstacle));
+        //System.out.println(Obstacles.myOctree);
     }
 
-    private static Vector3d mine(String data) throws Exception {
-        Pattern p = Pattern.compile("([\\d.-]*) ([\\d.-]*) ([\\d.-]*)");
+    private static void mine(String data) throws Exception {
+        Pattern p = Pattern.compile("([\\d.-]*) ([\\d.-]*) ([\\d.-]*) ([\\d.-]*) ([\\d.-]*) ([\\d.-]*)");
         Matcher m = p.matcher(data);
         if (m.find()) {
-            return new Vector3d(Double.parseDouble(m.group(1)),Double.parseDouble(m.group(2)),Double.parseDouble(m.group(3)));
+            Vector3d pos = new Vector3d(Double.parseDouble(m.group(1)),Double.parseDouble(m.group(2)),Double.parseDouble(m.group(3)));
+            Vector3d size = new Vector3d(Double.parseDouble(m.group(4)),Double.parseDouble(m.group(5)),Double.parseDouble(m.group(6)));
+            Obstacles.myOctree.setValue(pos,size, objectType.Obstacle);
+            return;
         }
         throw new Exception("Invalid file");
     }

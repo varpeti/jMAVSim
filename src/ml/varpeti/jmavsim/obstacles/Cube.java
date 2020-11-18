@@ -12,7 +12,7 @@ public class Cube extends Collidable {
 
      public Cube(Vector3d position, double size, String name) {
         super(position, new Vector3d(size,size,size), "models/cube"+size+".obj");
-        System.out.println(size);
+        //System.out.println(size);
         this.name = name;
     }
 
