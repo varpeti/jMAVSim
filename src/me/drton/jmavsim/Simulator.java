@@ -6,7 +6,6 @@ import me.drton.jmavsim.Visualizer3D.ViewTypes;
 import me.drton.jmavsim.Visualizer3D.ZoomModes;
 import me.drton.jmavsim.vehicle.AbstractMulticopter;
 import me.drton.jmavsim.vehicle.Quadcopter;
-import ml.varpeti.jmavsim.obstacles.Cube;
 
 import ml.varpeti.jmavsim.obstacles.Obstacles;
 import org.xml.sax.SAXException;
@@ -341,7 +340,7 @@ public class Simulator implements Runnable {
         world.addObject(vehicle);
 
         //Create Obstacles
-        Obstacles.newObstacles(world,SHOW_GUI,vehicle,new Vector3d(0.1,0.1,0.05));
+        Obstacles.newObstacles(world,SHOW_GUI,vehicle,new Vector3d(0.33,0.33,0.2));
 
         if (SHOW_GUI) {
             // Put camera on vehicle with gimbal

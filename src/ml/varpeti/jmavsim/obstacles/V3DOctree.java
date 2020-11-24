@@ -1,6 +1,9 @@
 package ml.varpeti.jmavsim.obstacles;
 
 import javax.vecmath.Vector3d;
+import java.util.ArrayList;
+
+import static java.lang.StrictMath.cbrt;
 
 enum objectType {Air, Obstacle, Vehicle}
 
@@ -71,5 +74,37 @@ public class V3DOctree extends Octree<objectType> {
 
         return ret;
     }
+
+     public ArrayList<V3DOctree> getLeavesInArea(Vector3d pos, Vector3d size)
+     {
+         ArrayList<V3DOctree> leaves = new ArrayList<>();
+         if (isFullyOutside(pos, size)) return leaves;
+
+         if (this.leaf) {
+             leaves.add(this);
+             return leaves;
+         }
+
+         for (int i = 0; i < numberOfChildren; i++)
+         {
+             ArrayList<V3DOctree> newLeaves = children[i].getLeavesInArea(pos, size);
+             if (newLeaves.size()>0) leaves.addAll(newLeaves);
+         }
+         return leaves;
+     }
+
+     public ArrayList<V3DOctree> getNeighbours(Vector3d pos)
+     {
+         V3DOctree cur = getLeavesInArea(pos, new Vector3d(0.0d, 0.0d, 0.0d)).get(0);
+         double minLength = cbrt(V3DOctree.minSize ) / 2.0d;
+         ArrayList<V3DOctree> neighbours = new ArrayList<>();
+         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(cur.size.x + minLength, 0.0d, 0.0d)));
+         neighbours.remove(cur);
+         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(0.0d, cur.size.y + minLength, 0.0d)));
+         neighbours.remove(cur);
+         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(0.0d, 0.0d, cur.size.z + minLength)));
+         neighbours.remove(cur);
+         return neighbours;
+     }
 
 }

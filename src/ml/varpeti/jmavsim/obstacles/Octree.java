@@ -1,6 +1,7 @@
 package ml.varpeti.jmavsim.obstacles;
 
 import javax.vecmath.Vector3d;
+import java.util.ArrayList;
 
 public abstract class Octree<V> {
     protected Vector3d pos;
@@ -54,7 +55,10 @@ public abstract class Octree<V> {
             this.leaf = true;
         } else if (!isFullyOutside(pos,size)) {
             //System.out.println("PartiallyContained "+this.area+" "+minSize);
-            if (this.area <= minSize) return;
+            if (this.area <= minSize) {
+                //this.value = value;
+                return;
+            }
             if (this.leaf) split();
             setChildValues(pos,size,value);
         }/*else
@@ -106,14 +110,14 @@ public abstract class Octree<V> {
                 pos.z + size.z >= this.pos.z + this.size.z );
     }
 
-     private boolean isFullyOutside(Vector3d pos, Vector3d size)
+     protected boolean isFullyOutside(Vector3d pos, Vector3d size)
      {
-         return (this.pos.x + this.size.x <= pos.x - size.x  ||
-                 this.pos.y + this.size.y <= pos.y - size.y  ||
-                 this.pos.z + this.size.z <= pos.z - size.z  ||
-                 this.pos.x - this.size.x >= pos.x + size.x  ||
-                 this.pos.y - this.size.y >= pos.y + size.y  ||
-                 this.pos.z - this.size.z >= pos.z + size.z  );
+         return (this.pos.x + this.size.x < pos.x - size.x  ||
+                 this.pos.y + this.size.y < pos.y - size.y  ||
+                 this.pos.z + this.size.z < pos.z - size.z  ||
+                 this.pos.x - this.size.x > pos.x + size.x  ||
+                 this.pos.y - this.size.y > pos.y + size.y  ||
+                 this.pos.z - this.size.z > pos.z + size.z  );
      }
 
      private void setChildValues(Vector3d pos, Vector3d size, V value)
@@ -171,4 +175,5 @@ public abstract class Octree<V> {
          }
      }
 
+    protected abstract ArrayList<V3DOctree> getLeavesInArea(Vector3d pos, Vector3d size);
 }

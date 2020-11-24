@@ -6,6 +6,7 @@ import me.drton.jmavsim.World;
 import javax.vecmath.Vector3d;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +55,14 @@ public final class Obstacles {
         Obstacles.myOctree.draw();
         System.out.println("Number of cubes: "+Obstacles.myOctree.numOf(objectType.Obstacle));
         //System.out.println(Obstacles.myOctree);
+
+        ArrayList<V3DOctree> list = Obstacles.myOctree.getNeighbours(new Vector3d(0.125,0.625,-0.125));
+        System.out.println(list.size());
+        for (V3DOctree i : list)
+        {
+            //Obstacles.world.addObject(new Cube(i.pos, i.size.x, i.pos.toString() + " " + i.size.x));
+            System.out.println(i.pos);
+        }
     }
 
     private static void mine(String data) throws Exception {
