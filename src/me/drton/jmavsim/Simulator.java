@@ -340,7 +340,7 @@ public class Simulator implements Runnable {
         world.addObject(vehicle);
 
         //Create Obstacles
-        Obstacles.newObstacles(world,SHOW_GUI,vehicle,new Vector3d(0.33,0.33,0.2));
+        Obstacles.newObstacles(world,SHOW_GUI,vehicle,new Vector3d(0.25,0.25,0.25));
 
         if (SHOW_GUI) {
             // Put camera on vehicle with gimbal
