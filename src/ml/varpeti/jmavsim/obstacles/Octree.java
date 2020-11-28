@@ -9,7 +9,7 @@ public abstract class Octree<V> {
     protected V value;
 
     protected boolean leaf;
-    protected double area;
+    protected double volume;
 
     public static double minSize;
     protected static final int numberOfChildren = 8;
@@ -28,7 +28,7 @@ public abstract class Octree<V> {
     public Octree(Vector3d pos, Vector3d size, V value)
     {
         this.pos = pos; this.size = size; this.value = value;
-        this.leaf = true; this.area = size.x*size.y*size.z*8;
+        this.leaf = true; this.volume = size.x*size.y*size.z*8;
         for (int i = 0; i < numberOfChildren; i++) {
             children[i] = null;
         }
@@ -55,7 +55,7 @@ public abstract class Octree<V> {
             this.leaf = true;
         } else if (!isFullyOutside(pos,size)) {
             //System.out.println("PartiallyContained "+this.area+" "+minSize);
-            if (this.area <= minSize) {
+            if (this.volume <= minSize) {
                 //this.value = value;
                 return;
             }

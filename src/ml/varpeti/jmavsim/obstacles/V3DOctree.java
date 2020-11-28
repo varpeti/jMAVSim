@@ -107,4 +107,33 @@ public class V3DOctree extends Octree<objectType> {
          return neighbours;
      }
 
+     static public ArrayList<Vector3d> cornerIt(ArrayList<V3DOctree> neighbours)
+     {
+         ArrayList<Vector3d> nodes = new ArrayList<>();
+         double minLength = cbrt(V3DOctree.minSize) / 2.0d;
+         for (V3DOctree n : neighbours)
+         {
+             if (n.volume <= V3DOctree.minSize)
+             {
+                 nodes.add(n.pos);
+                 continue;
+             }
+
+             Vector3d cs = new Vector3d(minLength, minLength, minLength);
+
+             //Corners
+             nodes.add(new Vector3d(n.pos.x+n.size.x-cs.x, n.pos.y+n.size.y-cs.y, n.pos.z+n.size.z-cs.z));
+             nodes.add(new Vector3d(n.pos.x-n.size.x+cs.x, n.pos.y+n.size.y-cs.y, n.pos.z+n.size.z-cs.z));
+             nodes.add(new Vector3d(n.pos.x+n.size.x-cs.x, n.pos.y-n.size.y+cs.y, n.pos.z+n.size.z-cs.z));
+             nodes.add(new Vector3d(n.pos.x-n.size.x+cs.x, n.pos.y-n.size.y+cs.y, n.pos.z+n.size.z-cs.z));
+             nodes.add(new Vector3d(n.pos.x+n.size.x-cs.x, n.pos.y+n.size.y-cs.y, n.pos.z-n.size.z+cs.z));
+             nodes.add(new Vector3d(n.pos.x-n.size.x+cs.x, n.pos.y+n.size.y-cs.y, n.pos.z-n.size.z+cs.z));
+             nodes.add(new Vector3d(n.pos.x+n.size.x-cs.x, n.pos.y-n.size.y+cs.y, n.pos.z-n.size.z+cs.z));
+             nodes.add(new Vector3d(n.pos.x-n.size.x+cs.x, n.pos.y-n.size.y+cs.y, n.pos.z-n.size.z+cs.z));
+
+
+         }
+         return nodes;
+     }
+
 }

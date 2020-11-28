@@ -6,7 +6,6 @@ import me.drton.jmavsim.World;
 import javax.vecmath.Vector3d;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,6 +60,19 @@ public final class Obstacles {
             world.getEnvironment().setCurrentWind(new Vector3d());
             world.getEnvironment().setWindDeviation(new Vector3d());
         }
+
+        /*/// System.out.println(Obstacles.myOctree);
+
+        ArrayList<V3DOctree> list = Obstacles.myOctree.getNeighbours(new Vector3d(0.125,0.625,-0.125));
+        ArrayList<Vector3d> corners = V3DOctree.cornerIt(list);
+        for (Vector3d i : corners) {
+            synchronized (world) {
+                Obstacles.world.addObject(new Cube(i, 0.125, i.toString()));
+            }
+            System.out.println(i);
+        }
+
+        //*///
 
     }
 
