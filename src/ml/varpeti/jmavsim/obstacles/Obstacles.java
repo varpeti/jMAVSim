@@ -1,11 +1,14 @@
 package ml.varpeti.jmavsim.obstacles;
 
 import me.drton.jmavsim.KinematicObject;
+import me.drton.jmavsim.MAVLinkHILSystem;
+import me.drton.jmavsim.MAVLinkHILSystemBase;
 import me.drton.jmavsim.World;
 
 import javax.vecmath.Vector3d;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +22,7 @@ public final class Obstacles {
 
     public static boolean initialized = false;
 
-    public static void newObstacles(World world, boolean showGui, KinematicObject vehicle, Vector3d vehicleSize) {
+    public static void newObstacles(World world, boolean showGui, KinematicObject vehicle, Vector3d vehicleSize, MAVLinkHILSystem hilSystem) {
 
         if (initialized) return; //It makes it singleton :?
 
@@ -34,6 +37,8 @@ public final class Obstacles {
         Obstacles.vehicleSize = vehicleSize;
         Obstacles.myOctree = new V3DOctree(rootPos,rootSize,objectType.Air);
         Octree.minSize = minSize;
+
+        Cube.hilSystem = hilSystem;
 
         //Add cubes from file //TODO or generate from seed
 
@@ -63,11 +68,13 @@ public final class Obstacles {
 
         /*/// System.out.println(Obstacles.myOctree);
 
-        ArrayList<V3DOctree> list = Obstacles.myOctree.getNeighbours(new Vector3d(0.125,0.625,-0.125));
-        ArrayList<Vector3d> corners = V3DOctree.cornerIt(list);
-        for (Vector3d i : corners) {
+        ArrayList<V3DOctree> list = //Obstacles.myOctree.getNeighbours(new Vector3d(0.125,0.625,-0.125));
+                Obstacles.myOctree.getNeighbours(new Vector3d(-16,16,-16));
+        //ArrayList<Vector3d> corners = V3DOctree.cornerIt(list);
+        System.out.println(list.size());
+        for (V3DOctree i : list) {
             synchronized (world) {
-                Obstacles.world.addObject(new Cube(i, 0.125, i.toString()));
+                Obstacles.world.addObject(new Cube(i.pos, i.size.x, i.toString()));
             }
             System.out.println(i);
         }

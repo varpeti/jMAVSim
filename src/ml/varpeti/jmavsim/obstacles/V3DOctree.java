@@ -98,11 +98,11 @@ public class V3DOctree extends Octree<objectType> {
          V3DOctree cur = getLeavesInArea(pos, new Vector3d(0.0d, 0.0d, 0.0d)).get(0);
          double minLength = cbrt(V3DOctree.minSize ) / 2.0d;
          ArrayList<V3DOctree> neighbours = new ArrayList<>();
-         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(cur.size.x + minLength, 0.0d, 0.0d)));
+         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(cur.size.x+minLength, cur.size.y-minLength, cur.size.z-minLength)));
          neighbours.remove(cur);
-         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(0.0d, cur.size.y + minLength, 0.0d)));
+         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(cur.size.x-minLength, cur.size.y+minLength, cur.size.z-minLength)));
          neighbours.remove(cur);
-         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(0.0d, 0.0d, cur.size.z + minLength)));
+         neighbours.addAll(getLeavesInArea(cur.pos, new Vector3d(cur.size.x-minLength, cur.size.y-minLength, cur.size.z+minLength)));
          neighbours.remove(cur);
          return neighbours;
      }
@@ -110,16 +110,20 @@ public class V3DOctree extends Octree<objectType> {
      static public ArrayList<Vector3d> cornerIt(ArrayList<V3DOctree> neighbours)
      {
          ArrayList<Vector3d> nodes = new ArrayList<>();
-         double minLength = cbrt(V3DOctree.minSize) / 2.0d;
+         double minLength = cbrt(V3DOctree.minSize);
          for (V3DOctree n : neighbours)
          {
-             if (n.volume <= V3DOctree.minSize)
-             {
-                 nodes.add(n.pos);
-                 continue;
-             }
+             nodes.add(n.pos); if (0==0) continue;
+             double thisLength = cbrt(n.volume);
 
-             Vector3d cs = new Vector3d(minLength, minLength, minLength);
+             if (thisLength <= minLength) continue; //Too small to step in
+
+             //Center
+             nodes.add(n.pos);
+
+             if (thisLength <= minLength*3) continue; //Too small to corner it
+
+             Vector3d cs = new Vector3d(minLength*2.0d, minLength*2.0d, minLength*2.0d);
 
              //Corners
              nodes.add(new Vector3d(n.pos.x+n.size.x-cs.x, n.pos.y+n.size.y-cs.y, n.pos.z+n.size.z-cs.z));

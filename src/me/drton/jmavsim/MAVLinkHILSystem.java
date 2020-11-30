@@ -269,7 +269,10 @@ public class MAVLinkHILSystem extends MAVLinkHILSystemBase {
                 msg_gps.set("vel", (int)(gps.getSpeed() * 100));
                 msg_gps.set("cog", (int) Math.toDegrees(gps.getCog()) * 100);
                 msg_gps.set("fix_type", gps.fix);
-                msg_gps.set("satellites_visible", 10);
+                if (customMessageHackedIntoGPS==0)
+                    msg_gps.set("satellites_visible", 10);
+                else
+                    msg_gps.set("satellites_visible",customMessageHackedIntoGPS);
                 sendMessage(msg_gps);
             }
         }
@@ -291,5 +294,11 @@ public class MAVLinkHILSystem extends MAVLinkHILSystemBase {
         stopped = false;
         gotHilActuatorControls = false;
         nextHilStatePub = 0;
+    }
+
+    private byte customMessageHackedIntoGPS = 0;
+    public void sendCustomMessageHackedIntoGPS(byte msg)
+    {
+        customMessageHackedIntoGPS = msg;
     }
 }
